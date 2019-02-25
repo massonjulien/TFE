@@ -1,24 +1,31 @@
 // Navigation/Navigation.js
 import React from 'react'
 import { Image, StyleSheet } from 'react-native'
-import { createStackNavigator, createAppContainer, createBottomTabNavigator  } from 'react-navigation'
+import { createStackNavigator, createAppContainer, createBottomTabNavigator, createSwitchNavigator  } from 'react-navigation'
+
 
 import Poster from '../Components/Poster'
 import Recherche from '../Components/Recherche'
 import Connexion from '../Components/Connexion'
 import Register from '../Components/Register'
 
-const ConnexionStackNavigator = createStackNavigator({
+
+const ConnectionNagivator = createStackNavigator({
   Connexion: {
-    screen: Connexion
+    screen: Connexion,
+    navigationOptions: {
+      headerLeft: null,
+      header: null
+    }
   },
   Register: {
     screen: Register,
     navigationOptions: {
-      title: "S'enregistrer"
+      headerLeft: null,
+      header: null
     }
   }
-})
+});
 
 const OlitotTabNavigator = createBottomTabNavigator({
   Recherche: {
@@ -42,7 +49,7 @@ const OlitotTabNavigator = createBottomTabNavigator({
     }
   },
   Profil: {
-    screen: ConnexionStackNavigator,
+    screen: ConnectionNagivator,
     navigationOptions: {
       tabBarIcon: () => {
         return <Image
@@ -66,5 +73,10 @@ const styles = StyleSheet.create({
     height:30
   }
 })
-
+const mapStateToProps = (state) => {
+  return {
+    email: state.email,
+    connected: state.connected
+  }
+}
 export default createAppContainer(OlitotTabNavigator)

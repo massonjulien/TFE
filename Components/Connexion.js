@@ -1,19 +1,34 @@
 import React from 'react';
-import { Button, View, Text, TextInput, StyleSheet, TouchableOpacity, Platform, KeyboardAvoidingView, Image } from 'react-native';
+import { Button, View, Text, TextInput, StyleSheet, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView, Image } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { createStackNavigator, createAppContainer } from 'react-navigation'; // Version can be specified in package.json
-
+import { connect } from 'react-redux'
+import AccountItem from './AccountItem'
 
 
 class Connexion extends React.Component {
 
-  constructor(){
-      super();
-
-      this.state = {Email: '', Password: '',  loading: false, disabled: false }
+  constructor(props){
+      super(props);
+      this.state = {isConnected : false, Email: '', Password: '',  loading: false, disabled: false}
   }
 
-  connexion = () =>  {
-    this.setState({ loading: true, disabled: true }, () => {
+
+
+  _connectionReducer(email = "", value){
+    const action = { type: value, value: email}
+    this.props.dispatch(action)
+  }
+
+/*
+  componentDidUpdate(){
+    console.log(this.props.email);
+    console.log(this.props.connected);
+  }
+*/
+
+  connexion = () => {
+    this.setState({loading: true, disabled: true }, () => {
           fetch('https://olitot.com/DB/INC/testUser.php', {
               method: 'POST',
               headers:
@@ -29,9 +44,8 @@ class Connexion extends React.Component {
 
           }).then((response) => response.json()).then((responseJson) => {
               if(responseJson){
-                //ici le code de connexion
-                alert('connexion');
-                this.setState({ loading: false, disabled: false });
+                this._connectionReducer(this.state.Email, "login")
+                this.setState({isConnected : true,loading: false, disabled: false });
               } else {
                 alert('Identifiant ou mot de passe incorrect');
                 this.setState({ loading: false, disabled: false });
@@ -43,57 +57,70 @@ class Connexion extends React.Component {
     });
   }
 
+  logoff = () => {
+    this._connectionReducer("", "logoff")
+    this.setState({isConnected: false})
+  }
+
 
   render() {
-    return (
+    if(this.state.isConnected == true){
+      return (
+          <View style={styles.LoggedContainer}>
+            <AccountItem style={styles.account} />
+            <TouchableOpacity
+              activeOpacity = { 0.8 } style = { styles.BtnLogOff }
+              onPress={this.logoff}>
+                <Text style = { styles.btnText }>Déconnexion</Text>
+            </TouchableOpacity>
+          </View>
+      )
+    } else if(this.state.isConnected == false){
+      return(
+        <KeyboardAwareScrollView
+          style={{ backgroundColor: '#4c69a5' }}
+          resetScrollToCoords={{ x: 0, y: 0 }}
+          contentContainerStyle={styles.container}
+          scrollEnabled={false}
+        >
+            <Image
+              style={styles.img}
+              source={require('../Image/olitoLogo.png')}
+            />
+            <Text style={styles.text}> Veuillez vous connecter </Text>
+            <TextInput
+              textContentType = "emailAddress"
+              keyboardType = "email-address"
+              underlineColorAndroid = "transparent"
+              placeholder = "Email"
+              style = { styles.textInput }
+              onChangeText = {(text) => this.setState({ Email: text })}
+            />
+            <TextInput
+              secureTextEntry={true}
+              underlineColorAndroid = "transparent"
+              placeholder = "Mot de passe"
+              style = { styles.textInput }
+              onChangeText = {(text) => this.setState({ Password: text })}
+            />
 
-      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-          <Image
-            style={styles.img}
-            source={require('../Image/olitoLogo.png')}
-          />
-          <Text style={styles.text}> Veuillez vous connecter </Text>
-          <TextInput
-            textContentType = "emailAddress"
-            keyboardType = "email-address"
-            autoComplete = "email"
-            underlineColorAndroid = "transparent"
-            placeholder = "Email"
-            style = { styles.textInput }
-            onChangeText = {(text) => this.setState({ Email: text })}
-          />
-          <TextInput
-            secureTextEntry={true}
-            underlineColorAndroid = "transparent"
-            placeholder = "Mot de passe"
-            style = { styles.textInput }
-            onChangeText = {(text) => this.setState({ Password: text })}
-          />
+            <TouchableOpacity
+              activeOpacity = { 0.8 } style = { styles.Btn }
+              onPress={this.connexion}>
+                <Text style = { styles.btnText }>Connexion</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            activeOpacity = { 0.8 } style = { styles.Btn }
-            onPress = { this.connexion }>
-              <Text style = { styles.btnText }>Connexion</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity = { 0.8 } style = { styles.Btn }
+              onPress = {() => this.props.navigation.navigate("Register")}>
+                <Text style = { styles.btnText }>S'enregistrer</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            activeOpacity = { 0.8 } style = { styles.Btn }
-            onPress = {() => this.props.navigation.navigate("Register")}>
-              <Text style = { styles.btnText }>S'enregistrer</Text>
-          </TouchableOpacity>
+        </KeyboardAwareScrollView>
 
-      </KeyboardAvoidingView>
-    );
-  }
-  _quoiReturn(connected){
-    if(connected===false){
-      console.log("false")
+      );
     }
-    else if (connected === true) {
-      console.log("true")
-    }
   }
-
 }
 
 const styles = StyleSheet.create({
@@ -103,6 +130,10 @@ const styles = StyleSheet.create({
     color: 'grey',
     marginBottom: 10
   },
+  LoggedContainer : {
+    backgroundColor: '#eee',
+    flex : 1,
+  },
   container: {
       overflow: "scroll",
       flex: 1,
@@ -111,6 +142,9 @@ const styles = StyleSheet.create({
       backgroundColor: '#eee',
       paddingHorizontal: 25,
       paddingTop: (Platform.OS == 'ios') ? 20 : 0
+  },
+  account : {
+    marginBottom : 500,
   },
   img: {
     width:105,
@@ -134,13 +168,27 @@ const styles = StyleSheet.create({
       backgroundColor: 'rgba(0,0,0,0.6)',
       alignSelf: 'stretch',
       padding: 10,
-      marginTop: 10
+      marginTop: 10,
   },
   btnText: {
       textAlign: 'center',
       color: 'white',
       fontSize: 16
+  },
+  BtnLogOff : {
+    marginHorizontal : 5,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    alignSelf: 'stretch',
+    padding: 10,
+    marginTop: 10,
+    marginBottom : 10,
   }
 })
 
-export default Connexion
+const mapStateToPros = (state) => {
+  return {
+    email: state.email,
+    connected: state.connected
+  }
+}
+export default connect(mapStateToPros)(Connexion)

@@ -1,18 +1,26 @@
 // Components/Search.js
 
 import React from 'react'
-import { StyleSheet, Text, View, TextInput, Button, FlatList } from 'react-native'
+import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity } from 'react-native'
 import food from '../Helpers/ExampleData'
 import FoodItem from './FoodItem'
 
 class Recherche extends React.Component {
+
+_search = () => {
+
+}
 
 render() {
     return (
       <View style={styles.mainContainer}>
         <View style={styles.headerContainer}>
           <TextInput style={styles.textInput} placeholder='Localité'/>
-          <Button style={{ height: 50 }} title='Rechercher' onPress={() => {}} />
+          <TouchableOpacity
+            activeOpacity = { 0.8 } style = { styles.Btn }
+            onPress={this.search}>
+              <Text style = { styles.btnText }>Rechercher</Text>
+          </TouchableOpacity>
         </View>
         <FlatList
           data={food}
@@ -41,7 +49,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingLeft: 5,
     backgroundColor: 'white'
-  }
+  },
+  Btn: {
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      alignSelf: 'stretch',
+      padding: 10,
+      marginTop: 10,
+      marginHorizontal : 5,
+  },
+  btnText: {
+      textAlign: 'center',
+      color: 'white',
+      fontSize: 16
+  },
 })
 
 export default Recherche

@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Platform, KeyboardAvoidingView, ScrollView, Image} from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 class Register extends React.Component {
   constructor(){
       super();
 
-      this.state = {Email: '', Name: '', LastName: '', Photo:'aze', Tel : '', Password : '', VerifPassword : '',  loading: false, disabled: false }
+      this.state = {Email: '', Name: '', LastName: '', Photo:'', Tel : '', Password : '', VerifPassword : '',  loading: false, disabled: false }
   }
 
   createNewUser = () =>  {
@@ -98,9 +99,14 @@ class Register extends React.Component {
   {
       return(
 
-        <KeyboardAvoidingView  style={styles.container} behavior="padding" enabled>
-
-          <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <KeyboardAwareScrollView
+          //style={styles.container}
+          //behavior="padding"
+          style={{ backgroundColor: '#4c69a5' }}
+          resetScrollToCoords={{ x: 0, y: 0 }}
+          contentContainerStyle={styles.container}
+          scrollEnabled={false}
+        >
             <Image
               style={styles.img}
               source={require('../Image/olitoLogo.png')}
@@ -158,15 +164,18 @@ class Register extends React.Component {
                 <Text style = { styles.btnText }>S'enregistrer</Text>
             </TouchableOpacity>
 
+            <TouchableOpacity
+              disabled = { this.state.disabled }
+              activeOpacity = { 0.8 } style = { styles.Btn }
+              onPress = {() => this.props.navigation.navigate("Connexion") }>
+                <Text style = { styles.btnText }>Retour</Text>
+            </TouchableOpacity>
+
             {
-                (this.state.loading)
-                ?
-                    (<ActivityIndicator size = "large" />)
-                :
-                    null
+                (this.state.loading) ? (<ActivityIndicator size = "large" />) : null
             }
-          </ScrollView>
-        </KeyboardAvoidingView>
+
+        </KeyboardAwareScrollView>
       );
   }
 }
@@ -175,16 +184,12 @@ class Register extends React.Component {
 const styles = StyleSheet.create(
 {
     container: {
-        overflow: 'scroll',
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#eee',
-        paddingHorizontal: 0,
-        paddingVertical: 0,
-        marginHorizontal: 0,
-        marginVertical:0,
-        paddingTop: 0//(Platform.OS == 'ios') ? 20 : 0
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#eee',
+      paddingHorizontal: 25,
+      paddingTop: (Platform.OS == 'ios') ? 20 : 0
     },
     img: {
       width:105,
@@ -194,15 +199,6 @@ const styles = StyleSheet.create(
       marginHorizontal: 5,
       marginVertical:0,
     },
-    scroll: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingTop: 0,
-      paddingBottom:45,
-      paddingVertical: 0,
-      marginHorizontal: 0,
-      marginVertical:0,
-    },
     textInput: {
         backgroundColor: 'white',
         height: 40,
@@ -210,15 +206,14 @@ const styles = StyleSheet.create(
         borderColor: 'grey',
         marginVertical: 5,
         alignSelf: 'stretch',
-        paddingTop: 8,
+        padding: 8,
         fontSize: 16
     },
     Btn: {
         backgroundColor: 'rgba(0,0,0,0.6)',
         alignSelf: 'stretch',
         padding: 10,
-        marginTop: 10,
-        marginBottom: 25
+        marginTop: 10
     },
     btnText: {
         textAlign: 'center',
