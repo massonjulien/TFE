@@ -13,11 +13,29 @@ class AccountItem extends React.Component {
   };
 }
 
+rate(nb){
+  if(nb >= 0 && nb < 1){
+     return require('../Image/noStar.jpg')
+  } else if(nb >= 1 && nb < 2){
+     return require('../Image/oneStar.jpg')
+  } else if(nb >= 2 && nb < 3){
+     return require('../Image/twoStar.jpg')
+  } else if(nb >= 3 && nb < 4){
+     return require('../Image/threeStar.jpg')
+  } else if(nb >= 4 && nb < 5){
+     return require('../Image/fourStar.jpg')
+  } else if(nb == 5){
+     return require('../Image/fiveStar.jpg')
+  } else if(nb == 'null'){
+
+  }
+}
+
 componentDidMount() {
   return fetch('https://olitot.com/DB/INC/recup_data.php?rq=' + this.props.email)
     .then((response) => response.json()).then((responseJson) => {
       this.setState({
-        dataSource : responseJson[0]
+        dataSource : responseJson[0],
       });
     })
     .catch((error) => {
@@ -33,23 +51,27 @@ render() {
       <View style={styles.firstContainer}>
         <Image
           style={styles.image}
-          source={{uri: 'https://olitot.com/DB/USER/inconnu.jpg'}}
+          source={{uri: this.state.dataSource['Photo']}}
         />
         <View style={styles.rate}>
-          <Text>Ici le rate</Text>
+          <Image
+            style={styles.imgRate}
+            source={this.rate(this.state.dataSource['Rate'])}
+          />
         </View>
       </View>
 
       <View style={styles.container}>
-        <Text> Ici l'email </Text>
+        <Text style={styles.enoncs}> Email  </Text>
+        <Text style={styles.datas}> {this.state.dataSource['Email']}</Text>
       </View>
 
       <View style={styles.container}>
-        <Text> Ici le Nom & prénom </Text>
+        <Text> {this.state.dataSource['Name']} {this.state.dataSource['LastName']} </Text>
       </View>
 
       <View style={styles.container}>
-        <Text> Ici le Tel </Text>
+        <Text> {this.state.dataSource['Tel']} </Text>
       </View>
 
       <View style={styles.container}>
@@ -66,6 +88,12 @@ const styles = StyleSheet.create({
     flex : 1,
     backgroundColor: '#eee',
   },
+  imgRate : {
+    width : 200,
+    height : 37,
+    marginTop : 10,
+  },
+  
   Btn: {
       backgroundColor: 'rgba(0,0,0,0.6)',
       alignSelf: 'stretch',
