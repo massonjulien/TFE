@@ -32,7 +32,7 @@
   </div>
 
   <div class="footer">
-    <p>All copyright reserved</p>
+    <p>© 2019 - Olitot</p>
   </div>
 </div>
 </body>

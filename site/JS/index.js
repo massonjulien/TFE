@@ -1,4 +1,5 @@
 $(document).ready(function(){
+  selected("INC_Acceuil");
   changePage("INC_Acceuil");
   $('li').click(function(){
     selected(this.id);
