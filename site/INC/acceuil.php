@@ -18,11 +18,11 @@
   <div class="row">
 
     <div class="topnav" id="myTopnav">
-      <a id="INC_Acceuil" href="INC_Acceuil">Acceuil</a>
+      <a class="margExtLeft" id="INC_Acceuil" href="INC_Acceuil">Acceuil</a>
       <a id="INC_Application" href="INC_Application">L'application</a>
       <a id="INC_Projet" href="INC_Projet">Le projet</a>
       <a id="INC_Terms" href="INC_Terms">Terms</a>
-      <a id="INC_Contact" href="INC_Contact">Contact</a>
+      <a class="margExtRight" id="INC_Contact" href="INC_Contact">Contact</a>
       <a href="javascript:void(0);" class="icon" onclick="myFunction()">
         <i class="fa fa-bars"></i>
       </a>
