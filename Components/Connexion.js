@@ -59,7 +59,7 @@ class Connexion extends React.Component {
 
   logoff = () => {
     this._connectionReducer("", "logoff")
-    this.setState({isConnected: false})
+    this.setState({isConnected: false, Email : '', Password : ''})
   }
 
 
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   LoggedContainer : {
-    backgroundColor: '#eee',
+    backgroundColor: 'white',
     flex : 1,
   },
   container: {
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#eee',
+      backgroundColor: 'white',
       paddingHorizontal: 25,
       paddingTop: (Platform.OS == 'ios') ? 20 : 0
   },
@@ -157,8 +157,8 @@ const styles = StyleSheet.create({
   textInput: {
       backgroundColor: 'white',
       height: 40,
-      borderWidth: 1,
-      borderColor: 'grey',
+      borderBottomColor: 'grey',
+      borderBottomWidth: 2,
       marginVertical: 5,
       alignSelf: 'stretch',
       padding: 8,
