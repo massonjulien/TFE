@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator,
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 class Register extends React.Component {
+
+  
   constructor(){
       super();
 
@@ -11,7 +13,7 @@ class Register extends React.Component {
 
   createNewUser = () =>  {
 
-          fetch('https://olitot.com/DB/INC/testEmail.php',
+          fetch('https://olitot.com/DB/INC/test_email.php',
           {
               method: 'POST',
               headers:

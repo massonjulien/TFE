@@ -1,46 +1,92 @@
-// Components/Poster.js
-
+import { connect } from 'react-redux'
 import React from 'react'
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 
 
 class Poster extends React.Component {
 
   render() {
-    return (
-      <View style={styles.mainContainer}>
-        <Text style={styles.text}> Poster une annonce </Text>
-        <TextInput style={styles.textInput} placeholder='Nom du plat'/>
-        <TextInput style={styles.textInput} placeholder='nombre de part'/>
-        <TextInput style={styles.textInput} placeholder='prix en €'/>
-        <TextInput style={styles.textInput} placeholder='Localité'/>
+      if(this.props.connected){
+        return (
+          <View style={styles.container}>
+            <View style={styles.firstContainer}>
+              <Text style={styles.Title}>Mes annonces</Text>
+            </View>
+            <View style={styles.flatContainer}>
+            </View>
+            <View style={styles.lastContainer}>
+              <TouchableOpacity
+                activeOpacity = { 0.8 } style = { styles.Btn }
+                onPress = {() => this.props.navigation.navigate("NewPost")}>
+                  <Text style = { styles.btnText }>Nouvelle annonce</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity = { 0.8 } style = { styles.Btn }
+                onPress = {() => this.props.navigation.navigate("Address")}>
+                  <Text style = { styles.btnText }>Mes Adresses</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )
+      } else {
+        return (
+          <View style={styles.containerUnconnected}><Text style={styles.txUnconnected}>Vous devez être connecté pour pouvoir poster une annonce !</Text></View>
+        )
+      }
 
-        <Button title="Poster" onPress={() => {}}/>
-      </View>
-    )
+
   }
 }
 
 const styles = StyleSheet.create({
-  text: {
-    textAlign: 'center',
-    fontSize: 20,
-    color: 'grey',
-    marginBottom: 10
+  Title : {
+      textAlign: 'center',
+      fontSize: 20,
+      color: 'grey',
+      marginBottom: 10
   },
-  mainContainer: {
-    flex: 1,
-    justifyContent: 'center'
+  txUnconnected : {
+    margin : 25,
+    color : 'grey',
+    fontSize : 17,
+    textAlign:'center',
   },
-  textInput: {
-    marginLeft: 5,
-    marginRight: 5,
-    height: 50,
-    borderColor: '#000000',
-    borderWidth: 1,
-    paddingLeft: 5,
-    marginTop: 5
-  }
+  containerUnconnected : {
+    flex : 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  container : {
+      flex : 1,
+      marginHorizontal : 15,
+  },
+  firstContainer : {
+    marginTop : 30,
+    flex : 1,
+  },
+  flatContainer : {
+    flex : 4,
+  },
+  lastContainer : {
+    flex : 1,
+  },
+  Btn: {
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      alignSelf: 'stretch',
+      padding: 10,
+      marginTop: 10,
+  },
+  btnText: {
+      textAlign: 'center',
+      color: 'white',
+      fontSize: 16
+  },
 })
 
-export default Poster
+const mapStateToPros = (state) => {
+  return {
+    email: state.email,
+    connected: state.connected
+  }
+}
+export default connect(mapStateToPros)(Poster)

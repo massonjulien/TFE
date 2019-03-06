@@ -10,10 +10,18 @@ class Connexion extends React.Component {
 
   constructor(props){
       super(props);
-      this.state = {isConnected : false, Email: '', Password: '',  loading: false, disabled: false}
+      this.state = {loading : false, disabled : false, isConnected : false, Email: '', Password: '',  loading: false, disabled: false}
   }
 
-
+  _displayLoading(){
+    if(this.state.isLoading){
+      return (
+        <View style={styles.loading_container}>
+          <ActivityIndicator size='large' />
+        </View>
+      )
+    }
+  }
 
   _connectionReducer(email = "", value){
     const action = { type: value, value: email}
@@ -29,7 +37,7 @@ class Connexion extends React.Component {
 
   connexion = () => {
     this.setState({loading: true, disabled: true }, () => {
-          fetch('https://olitot.com/DB/INC/testUser.php', {
+          fetch('https://olitot.com/DB/INC/test_user.php', {
               method: 'POST',
               headers:
               {
@@ -115,7 +123,7 @@ class Connexion extends React.Component {
               onPress = {() => this.props.navigation.navigate("Register")}>
                 <Text style = { styles.btnText }>S'enregistrer</Text>
             </TouchableOpacity>
-
+            {this._displayLoading()}
         </KeyboardAwareScrollView>
 
       );

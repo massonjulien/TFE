@@ -3,14 +3,14 @@ import { connect } from 'react-redux'
 import React from 'react'
 import { StyleSheet, ActivityIndicator, Button, ListView, Text, View, Alert, FlatList, Image, TouchableOpacity, TextInput } from 'react-native'
 import Modal from "react-native-modal"
-import ExtraDimensions from 'react-native-extra-dimensions-android';
+
 
 class AccountItem extends React.Component {
 
   constructor(props) {
   super(props);
   this.state = {
-    isLoading: true, dataSource: [], isModalTelVisible: false, isModalPwdVisible:false, isModalPhotoVisible : false,
+    loading: false, dataSource: [], isModalTelVisible: false, isModalPwdVisible:false, isModalPhotoVisible : false,
     Tel : '', Password : '', newTel : '',  oldPwd : '', verifPwd : '', newPwd : '', Photo : 'x',
   };
 }
@@ -67,7 +67,7 @@ _changeTel = () => {
         }).then((response) => response.json()).then((responseJson) =>
         {
             alert("Numéro de téléphone changé!");
-            this.setState({ isModalTelVisible: !this.state.isModalTelVisible, Tel : this.state.newTel, newTel : '' });
+            this.setState({ loading : false, isModalTelVisible: !this.state.isModalTelVisible, Tel : this.state.newTel, newTel : '' });
         }).catch((error) =>
         {
             //alert(error);
@@ -79,8 +79,8 @@ _changeTel = () => {
 }
 
 _changePwd = () => {
-  this.setState({loading: true, disabled: true }, () => {
-        fetch('https://olitot.com/DB/INC/testUser.php', {
+  this.setState({loading: true}, () => {
+        fetch('https://olitot.com/DB/INC/test_user.php', {
             method: 'POST',
             headers:
             {
@@ -114,7 +114,7 @@ _changePwd = () => {
                   }).then((response) => response.json()).then((responseJson) =>
                   {
                       alert("Mot de passe changé!");
-                      this.setState({ isModalPwdVisible: !this.state.isModalPwdVisible, Password : this.state.newPwd, oldPwd : '', verifPwd : '', newPwd : '' });
+                      this.setState({ loading : false, isModalPwdVisible: !this.state.isModalPwdVisible, Password : this.state.newPwd, oldPwd : '', verifPwd : '', newPwd : '' });
                   }).catch((error) =>
                   {
                       //alert(error);
@@ -147,9 +147,30 @@ _toggleModalPwd = () =>
 _toggleModalPhoto = () =>
     this.setState({ isModalPhotoVisible: !this.state.isModalPhotoVisible });
 
+_displayLoading(){
+    if(this.state.isLoading){
+      return (
+        <View style={styles.loading_container}>
+          <ActivityIndicator size='large' />
+        </View>
+      )
+    }
+}
+
 componentDidMount() {
-  return fetch('https://olitot.com/DB/INC/recup_data.php?rq=' + this.props.email)
-    .then((response) => response.json()).then((responseJson) => {
+  return fetch('https://olitot.com/DB/INC/recup_data.php', {
+      method: 'POST',
+      headers:
+      {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(
+      {
+        Email : this.props.email
+      })
+
+  }).then((response) => response.json()).then((responseJson) => {
       this.setState({
         dataSource : responseJson[0],
         Tel : responseJson[0].Tel,
@@ -236,6 +257,7 @@ render() {
                   source={{uri: this.state.Photo}}
                 />
               </TouchableOpacity>
+
           </View>
           <TouchableOpacity style={styles.sendTouch} onPress={() => {}}>
             <Text style={styles.btnModal}> CHANGER </Text>
@@ -287,7 +309,7 @@ render() {
       <TouchableOpacity style={styles.container} onPress={this._toggleModalPwd}>
         <Text style={styles.enoncs}> Password </Text>
         <View style={styles.datas}>
-         <Text style={styles.datasText}> {this.countPassword(this.state.Password)} </Text>
+         <Text style={styles.datasText}> {this.countPassword("coucoucu")} </Text>
         </View>
       </TouchableOpacity>
     </View>

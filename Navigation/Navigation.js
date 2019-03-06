@@ -9,7 +9,32 @@ import Recherche from '../Components/Recherche'
 import Connexion from '../Components/Connexion'
 import Register from '../Components/Register'
 import Commander from '../Components/Commander'
+import NewPost from '../Components/NewPost'
+import Address from '../Components/Address'
 
+const PostNavigator = createStackNavigator({
+  Poster: {
+    screen: Poster,
+    navigationOptions: {
+      headerLeft: null,
+      header: null
+    }
+  },
+  NewPost: {
+    screen: NewPost,
+    navigationOptions: {
+      headerLeft: null,
+      header: null
+    }
+  },
+  Address: {
+    screen: Address,
+    navigationOptions: {
+      headerLeft: null,
+      header: null,
+    }
+  },
+});
 
 const ConnectionNagivator = createStackNavigator({
   Connexion: {
@@ -68,7 +93,7 @@ const OlitotTabNavigator = createBottomTabNavigator({
     }
   },
   Poster: {
-    screen: Poster,
+    screen: PostNavigator,
     navigationOptions: {
       tabBarIcon: ({ focused }) => {
         const icon = focused
