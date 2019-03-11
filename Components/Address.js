@@ -2,14 +2,44 @@ import { connect } from 'react-redux'
 import React from 'react'
 import {StyleSheet, ActivityIndicator, Text, View, FlatList, Image, TouchableOpacity, TextInput} from 'react-native'
 import Modal from "react-native-modal"
+import dataAddress from "../Helpers/AddressData"
+import AddressItem from './AddressItem'
 
 class Address extends React.Component {
 
   constructor(props) {
   super(props);
   this.state = {
-      isModalAdVisible : false, country : '', city : '', postal : '', address: '', num : ''
+      isModalAdVisible : false, country : '', city : '', postal : '', address: '', num : '', dataSource : [], nbAddress : 0,
     };
+  }
+
+  _deleteAddress = (id) =>{
+    this.setState({ loading: true, disabled: true }, () =>
+    {
+        fetch('https://olitot.com/DB/INC/delete_address.php',
+        {
+            method: 'POST',
+            headers:
+            {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(
+            {
+              id : id
+
+            })
+
+        }).then((response) => response.json()).then((responseJson) =>
+        {
+            this.componentDidMount();
+            this.forceUpdate();
+        }).catch((error) =>
+        {
+
+        });
+    });
   }
 
   addAd = () => {
@@ -41,7 +71,8 @@ class Address extends React.Component {
                   }).then((response) => response.json()).then((responseJson) =>
                   {
                       alert("Adresse ajoutée !");
-                      this.setState({ loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
+                      this.componentDidMount();
+                      this.setState({addressEmpty : false ,loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' }, () => {this.forceUpdate();});
                   }).catch((error) =>
                   {
                       //alert(error);
@@ -67,13 +98,50 @@ class Address extends React.Component {
     }
   }
 
-  _toggleModalAd = () =>
+  componentDidMount() {
+    return fetch('https://olitot.com/DB/INC/recup_address.php', {
+        method: 'POST',
+        headers:
+        {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+        {
+          Email : this.props.email
+        })
+
+    }).then((response) => response.json()).then((responseJson) => {
+        if(responseJson != false ){
+          this.setState({
+            dataSource : responseJson, addressEmpty : false, nbAddress : responseJson.length
+          });
+        } else {
+          this.setState({
+            addressEmpty : true,
+          });
+        }
+
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  _toggleModalAd = () => {
+    if(this.state.nbAddress >= 3){
+      alert("Trop d'adresse. Veuillez en supprimer une pour en pouvoir en ajouter une nouvelle.")
+    } else {
       this.setState({ isModalAdVisible: !this.state.isModalAdVisible });
+    }
+  }
+
+
 
   render() {
+    if(this.state.addressEmpty){
       return (
         <View style={styles.container}>
-
         <Modal  isVisible={this.state.isModalAdVisible} >
           <View style={styles.modalContainerFirst}>
             <View style={styles.modalMain}>
@@ -98,7 +166,7 @@ class Address extends React.Component {
                 />
                 <TextInput
                   underlineColorAndroid = "transparent"
-                  placeholder = "Addresse"
+                  placeholder = "Adresse"
                   style = { styles.textInput }
                   onChangeText = {(text) => this.setState({ address: text })}
                 />
@@ -124,8 +192,8 @@ class Address extends React.Component {
           <View style={styles.firstContainer}>
             <Text style={styles.Title}>Mes adresses</Text>
           </View>
-          <View style={styles.flatContainer}>
-             {this.displayAddress}
+          <View style={styles.flatList}>
+            <Text>Pas d'adresse enregistré</Text>
           </View>
           <View style={styles.lastContainer}>
             <TouchableOpacity
@@ -141,7 +209,82 @@ class Address extends React.Component {
           </View>
         </View>
       )
+    } else {
+      return (
+        <View style={styles.container}>
 
+            <Modal  isVisible={this.state.isModalAdVisible} >
+              <View style={styles.modalContainerFirst}>
+                <View style={styles.modalMain}>
+                    <Text style={styles.modalTxtIntro}>Ajouter une adresse</Text>
+                    <TextInput
+                      underlineColorAndroid = "transparent"
+                      placeholder = "Pays"
+                      style = { styles.textInput }
+                      onChangeText = {(text) => this.setState({ country: text })}
+                    />
+                    <TextInput
+                      underlineColorAndroid = "transparent"
+                      placeholder = "Ville"
+                      style = { styles.textInput }
+                      onChangeText = {(text) => this.setState({ city: text })}
+                    />
+                    <TextInput
+                      underlineColorAndroid = "transparent"
+                      placeholder = "Code Postal"
+                      style = { styles.textInput }
+                      onChangeText = {(text) => this.setState({ postal: text })}
+                    />
+                    <TextInput
+                      underlineColorAndroid = "transparent"
+                      placeholder = "Adresse"
+                      style = { styles.textInput }
+                      onChangeText = {(text) => this.setState({ address: text })}
+                    />
+                    <TextInput
+                      underlineColorAndroid = "transparent"
+                      placeholder = "Numéro"
+                      style = { styles.textInput }
+                      onChangeText = {(text) => this.setState({ num: text })}
+                    />
+                </View>
+                <TouchableOpacity style={styles.sendTouch} onPress={this.addAd}>
+                  <Text style={styles.btnModal}> Ajouter </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.modalContainerLast}>
+                <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalAd}>
+                  <Text style={styles.btnModal}> Annuler </Text>
+                </TouchableOpacity>
+              </View>
+            </Modal>
+
+
+          <View style={styles.firstContainer}>
+            <Text style={styles.Title}>Mes adresses</Text>
+          </View>
+          <View style={styles.flatList}>
+            <FlatList
+              data={this.state.dataSource}
+              keyExtractor={(item) => item.Id.toString()}
+              renderItem={({item}) => <AddressItem address={item} deleteAddress={this._deleteAddress}/>}
+            />
+          </View>
+          <View style={styles.lastContainer}>
+            <TouchableOpacity
+              activeOpacity = { 0.8 } style = { styles.Btn }
+              onPress={this._toggleModalAd}>
+                <Text style = { styles.btnText }>Nouvelle adresse</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity = { 0.8 } style = { styles.Btn }
+              onPress = {() => this.props.navigation.navigate("Poster")}>
+                <Text style = { styles.btnText }>Retour</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
+    }
   }
 }
 
@@ -172,8 +315,10 @@ const styles = StyleSheet.create({
     marginTop : 30,
     flex : 1,
   },
-  flatContainer : {
+  flatList : {
     flex : 4,
+    borderTopColor : 'grey',
+    borderTopWidth : 1,
   },
   lastContainer : {
     flex : 1,

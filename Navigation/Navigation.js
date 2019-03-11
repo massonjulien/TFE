@@ -145,8 +145,8 @@ const styles = StyleSheet.create({
     height:30
   },
   activeIconPoster : {
-    width: 45,
-    height:45
+    width: 40,
+    height:40
   },
   inactiveIconPoster : {
     width: 35,

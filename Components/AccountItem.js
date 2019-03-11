@@ -1,7 +1,7 @@
 // Components/FilmItem.js
 import { connect } from 'react-redux'
 import React from 'react'
-import { StyleSheet, ActivityIndicator, Button, ListView, Text, View, Alert, FlatList, Image, TouchableOpacity, TextInput } from 'react-native'
+import { StyleSheet, ActivityIndicator, ScrollView, Button, ListView, Text, View, Alert, FlatList, Image, TouchableOpacity, TextInput } from 'react-native'
 import Modal from "react-native-modal"
 
 
@@ -10,7 +10,7 @@ class AccountItem extends React.Component {
   constructor(props) {
   super(props);
   this.state = {
-    loading: false, dataSource: [], isModalTelVisible: false, isModalPwdVisible:false, isModalPhotoVisible : false,
+    loading: false, dataSource: [], isModalTelVisible: false, isModalPwdVisible:false, isModalPhotoVisible : false, isModalTelChangedVisible : false,
     Tel : '', Password : '', newTel : '',  oldPwd : '', verifPwd : '', newPwd : '', Photo : 'x',
   };
 }
@@ -66,8 +66,8 @@ _changeTel = () => {
 
         }).then((response) => response.json()).then((responseJson) =>
         {
-            alert("Numéro de téléphone changé!");
-            this.setState({ loading : false, isModalTelVisible: !this.state.isModalTelVisible, Tel : this.state.newTel, newTel : '' });
+            
+            this.setState({ loading : false, isModalTelVisible: !this.state.isModalTelVisible, isModalTelChangedVisible : !this.state.isModalTelChangedVisible, Tel : this.state.newTel, newTel : '' });
         }).catch((error) =>
         {
             //alert(error);
@@ -141,6 +141,9 @@ _changePwd = () => {
 _toggleModalTel = () =>
     this.setState({ isModalTelVisible: !this.state.isModalTelVisible, newTel : '' });
 
+_toggleModalTelChanged = () =>
+    this.setState({ isModalTelChangedVisible: !this.state.isModalTelChangedVisible });
+
 _toggleModalPwd = () =>
     this.setState({ isModalPwdVisible: !this.state.isModalPwdVisible, oldPwd : '', newPwd : '', verifPwd : '' });
 
@@ -206,6 +209,17 @@ render() {
         <View style={styles.modalContainerLast}>
           <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalTel}>
             <Text style={styles.btnModal}> CANCEL </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Modal  isVisible={this.state.isModalTelChangedVisible} >
+        <View style={styles.modalContainerFirst}>
+          <View style={styles.modalMain}>
+              <Text style={styles.modalTxtIntro}>Votre numéro de téléhpone a changé !</Text>
+          </View>
+          <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalTelChanged}>
+            <Text style={styles.btnModal}> OK </Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -394,7 +408,7 @@ const styles = StyleSheet.create({
     width:100,
     height:100,
     backgroundColor:'#fff',
-    borderRadius:100,
+    borderRadius:50,
   },
   rate : {
     flex : 1,
@@ -409,6 +423,7 @@ const styles = StyleSheet.create({
   },
   container : {
     flex : 1,
+    height : 100,
     marginHorizontal: 20,
     borderBottomColor: 'grey',
     borderBottomWidth: 0.5
@@ -424,7 +439,7 @@ const styles = StyleSheet.create({
   datasText : {
     justifyContent: 'center',
     alignItems: 'center',
-    fontSize : 20,
+    fontSize : 15,
     fontStyle : 'italic',
   }
 });

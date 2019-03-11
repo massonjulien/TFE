@@ -6,6 +6,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 class Poster extends React.Component {
 
   render() {
+
       if(this.props.connected){
         return (
           <View style={styles.container}>
@@ -59,13 +60,14 @@ const styles = StyleSheet.create({
   container : {
       flex : 1,
       marginHorizontal : 15,
+      marginBottom : '5%',
   },
   firstContainer : {
     marginTop : 30,
     flex : 1,
   },
   flatContainer : {
-    flex : 4,
+    flex : 7,
   },
   lastContainer : {
     flex : 1,

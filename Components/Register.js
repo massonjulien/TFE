@@ -4,7 +4,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 class Register extends React.Component {
 
-  
+
   constructor(){
       super();
 
@@ -100,7 +100,6 @@ class Register extends React.Component {
   render()
   {
       return(
-
         <KeyboardAwareScrollView
           //style={styles.container}
           //behavior="padding"
