@@ -13,7 +13,7 @@ class Register extends React.Component {
 
   createNewUser = () =>  {
 
-          fetch('https://olitot.com/DB/INC/test_email.php',
+          fetch('https://olitot.com/DB/INC/postgres.php',
           {
               method: 'POST',
               headers:
@@ -23,7 +23,8 @@ class Register extends React.Component {
               },
               body: JSON.stringify(
               {
-                Email : this.state.Email,
+                action : 'testEmail',
+                email : this.state.Email,
               })
 
           }).then((response) => response.json()).then((responseJson) =>
@@ -62,7 +63,7 @@ class Register extends React.Component {
   saveData = () =>  {
       this.setState({ loading: true, disabled: true }, () =>
       {
-          fetch('https://olitot.com/DB/INC/user_registration.php',
+          fetch('https://olitot.com/DB/INC/postgres.php',
           {
               method: 'POST',
               headers:
@@ -72,15 +73,12 @@ class Register extends React.Component {
               },
               body: JSON.stringify(
               {
-                Email : this.state.Email,
-
-                Name: this.state.Name,
-
-                LastName: this.state.LastName,
-
-                Tel: this.state.Tel,
-
-                Password: this.state.Password
+                action : 'userRegistration',
+                email : this.state.Email,
+                firstname: this.state.Name,
+                lastname: this.state.LastName,
+                phone: this.state.Tel,
+                password: this.state.Password
               })
 
           }).then((response) => response.json()).then((responseJson) =>

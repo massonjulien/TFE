@@ -3,7 +3,7 @@ import { Button, View, Text, TextInput, StyleSheet, TouchableOpacity, Platform, 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { createStackNavigator, createAppContainer } from 'react-navigation'; // Version can be specified in package.json
 import { connect } from 'react-redux'
-import AccountItem from './AccountItem'
+import AccountItem from './Item/AccountItem'
 
 
 class Connexion extends React.Component {
@@ -28,16 +28,99 @@ class Connexion extends React.Component {
     this.props.dispatch(action)
   }
 
-/*
   componentDidUpdate(){
     console.log(this.props.email);
     console.log(this.props.connected);
   }
-*/
+
+  myOrders(){
+    return fetch('https://olitot.com/DB/INC/postgres.php', {
+        method: 'POST',
+        headers:
+        {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+        {
+          action : 'getMyOrders',
+          email : this.props.email
+        })
+
+    }).then((response) => response.json()).then((responseJson) => {
+        if(responseJson != false ){
+          this._connectionReducer(responseJson, 'myOrders');
+        } else {
+
+        }
+
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  address() {
+    return fetch('https://olitot.com/DB/INC/postgres.php', {
+        method: 'POST',
+        headers:
+        {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+        {
+          action : 'getAddress',
+          email : this.props.email
+        })
+
+    }).then((response) => response.json()).then((responseJson) => {
+        if(responseJson != false ){
+          this._connectionReducer(responseJson, 'address');
+          this._connectionReducer(responseJson.length, 'nbAddress');
+        } else {
+
+        }
+
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+  }
+
+  annonce() {
+    return fetch('https://olitot.com/DB/INC/postgres.php', {
+        method: 'POST',
+        headers:
+        {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+        {
+          action : 'getAdverts',
+          email : this.props.email
+        })
+
+    }).then((response) => response.json()).then((responseJson) => {
+        if(responseJson != false ){
+          this._connectionReducer(responseJson, 'annonce');
+        } else {
+
+        }
+
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    }
+
 
   connexion = () => {
     this.setState({loading: true, disabled: true }, () => {
-          fetch('https://olitot.com/DB/INC/test_user.php', {
+          fetch('https://olitot.com/DB/INC/postgres.php', {
               method: 'POST',
               headers:
               {
@@ -46,13 +129,18 @@ class Connexion extends React.Component {
               },
               body: JSON.stringify(
               {
-                Email : this.state.Email,
-                Password : this.state.Password
+                action : 'testUser',
+                email : this.state.Email,
+                password : this.state.Password
               })
 
           }).then((response) => response.json()).then((responseJson) => {
+              console.log(responseJson);
               if(responseJson){
                 this._connectionReducer(this.state.Email, "login")
+                this.annonce();
+                this.address();
+                this.myOrders();
                 this.setState({isConnected : true,loading: false, disabled: false });
               } else {
                 alert('Identifiant ou mot de passe incorrect');

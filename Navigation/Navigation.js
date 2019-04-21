@@ -5,12 +5,15 @@ import { createStackNavigator, createAppContainer, createBottomTabNavigator, cre
 
 
 import Poster from '../Components/Poster'
-import Recherche from '../Components/Recherche'
+import Search from '../Components/Search'
 import Connexion from '../Components/Connexion'
 import Register from '../Components/Register'
-import Commander from '../Components/Commander'
+import MyOrders from '../Components/MyOrders'
 import NewPost from '../Components/NewPost'
 import Address from '../Components/Address'
+import AnnonceDetail from '../Components/Detail/AnnonceDetail'
+import FoodDetail from '../Components/Detail/FoodDetail'
+import MyOrderDetail from '../Components/Detail/MyOrderDetail'
 
 const PostNavigator = createStackNavigator({
   Poster: {
@@ -34,6 +37,9 @@ const PostNavigator = createStackNavigator({
       header: null,
     }
   },
+  AnnonceDetail : {
+    screen : AnnonceDetail
+  }
 });
 
 const ConnectionNagivator = createStackNavigator({
@@ -53,9 +59,35 @@ const ConnectionNagivator = createStackNavigator({
   }
 });
 
+const SearchNavigator = createStackNavigator({
+  Search: {
+    screen: Search,
+    navigationOptions: {
+      headerLeft: null,
+      header: null
+    }
+  },
+  FoodDetail: {
+    screen: FoodDetail,
+  }
+});
+
+const MyOrdersNavigator = createStackNavigator({
+  MyOrders: {
+    screen: MyOrders,
+    navigationOptions: {
+      headerLeft: null,
+      header: null
+    }
+  },
+  MyOrderDetail: {
+    screen: MyOrderDetail,
+  }
+});
+
 const OlitotTabNavigator = createBottomTabNavigator({
-  Recherche: {
-    screen: Recherche,
+  Search: {
+    screen: SearchNavigator,
     navigationOptions: {
       tabBarIcon: ({ focused }) => {
         const icon = focused
@@ -73,8 +105,8 @@ const OlitotTabNavigator = createBottomTabNavigator({
       }
     }
   },
-  Commander: {
-    screen: Commander,
+  MyOrders: {
+    screen: MyOrdersNavigator,
     navigationOptions: {
       tabBarIcon: ({ focused }) => {
         const icon = focused
@@ -153,8 +185,8 @@ const styles = StyleSheet.create({
     height:35
   },
   activeIcon:{
-    width: 40,
-    height:40
+    width: 35,
+    height:35
   },
   inactiveIcon:{
     width:30,

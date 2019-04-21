@@ -2,22 +2,26 @@ import { connect } from 'react-redux'
 import React from 'react'
 import {StyleSheet, ActivityIndicator, Text, View, FlatList, Image, TouchableOpacity, TextInput} from 'react-native'
 import Modal from "react-native-modal"
-import dataAddress from "../Helpers/AddressData"
-import AddressItem from './AddressItem'
+import AddressItem from './Item/AddressItem'
 
 class Address extends React.Component {
 
   constructor(props) {
   super(props);
   this.state = {
-      isModalAdVisible : false, country : '', city : '', postal : '', address: '', num : '', dataSource : [], nbAddress : 0,
+      isModalAdVisible : false, country : '', city : '', postal : '', address: '', num : ''
     };
+  }
+
+  _connectionReducer(data, value){
+    const action = { type: value, value: data}
+    this.props.dispatch(action)
   }
 
   _deleteAddress = (id) =>{
     this.setState({ loading: true, disabled: true }, () =>
     {
-        fetch('https://olitot.com/DB/INC/delete_address.php',
+        fetch('https://olitot.com/DB/INC/postgres.php',
         {
             method: 'POST',
             headers:
@@ -27,16 +31,14 @@ class Address extends React.Component {
             },
             body: JSON.stringify(
             {
+              action : 'deleteAddress',
               id : id
 
             })
 
-        }).then((response) => response.json()).then((responseJson) =>
-        {
-            this.componentDidMount();
-            this.forceUpdate();
-        }).catch((error) =>
-        {
+        }).then((response) => response.json()).then((responseJson) => {
+            this.address();
+        }).catch((error) => {
 
         });
     });
@@ -50,7 +52,7 @@ class Address extends React.Component {
             if(this.state.num != ''){
               this.setState({ loading: true, disabled: true }, () =>
               {
-                  fetch('https://olitot.com/DB/INC/add_address.php',
+                  fetch('https://olitot.com/DB/INC/postgres.php',
                   {
                       method: 'POST',
                       headers:
@@ -60,19 +62,20 @@ class Address extends React.Component {
                       },
                       body: JSON.stringify(
                       {
-                        Email : this.props.email,
-                        Country : this.state.country,
-                        City : this.state.city,
-                        Postal : this.state.postal,
-                        Address : this.state.address,
-                        Num : this.state.num
+                        action : 'addAddress',
+                        email : this.props.email,
+                        country : this.state.country,
+                        city : this.state.city,
+                        zip : this.state.postal,
+                        address : this.state.address,
+                        num : this.state.num
                       })
 
                   }).then((response) => response.json()).then((responseJson) =>
                   {
                       alert("Adresse ajoutée !");
-                      this.componentDidMount();
-                      this.setState({addressEmpty : false ,loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' }, () => {this.forceUpdate();});
+                      this.address();
+                      this.setState({loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
                   }).catch((error) =>
                   {
                       //alert(error);
@@ -98,8 +101,8 @@ class Address extends React.Component {
     }
   }
 
-  componentDidMount() {
-    return fetch('https://olitot.com/DB/INC/recup_address.php', {
+  address() {
+    return fetch('https://olitot.com/DB/INC/postgres.php', {
         method: 'POST',
         headers:
         {
@@ -108,19 +111,14 @@ class Address extends React.Component {
         },
         body: JSON.stringify(
         {
-          Email : this.props.email
+          action : 'getAddress',
+          email : this.props.email
         })
 
     }).then((response) => response.json()).then((responseJson) => {
-        if(responseJson != false ){
-          this.setState({
-            dataSource : responseJson, addressEmpty : false, nbAddress : responseJson.length
-          });
-        } else {
-          this.setState({
-            addressEmpty : true,
-          });
-        }
+          this._connectionReducer(responseJson, 'address');
+          this._connectionReducer(responseJson.length, 'nbAddress');
+          this.forceUpdate();
 
       })
       .catch((error) => {
@@ -129,7 +127,7 @@ class Address extends React.Component {
   }
 
   _toggleModalAd = () => {
-    if(this.state.nbAddress >= 3){
+    if(this.props.nbAddress >= 3){
       alert("Trop d'adresse. Veuillez en supprimer une pour en pouvoir en ajouter une nouvelle.")
     } else {
       this.setState({ isModalAdVisible: !this.state.isModalAdVisible });
@@ -139,7 +137,7 @@ class Address extends React.Component {
 
 
   render() {
-    if(this.state.addressEmpty){
+    if(this.props.addressEmpty){
       return (
         <View style={styles.container}>
         <Modal  isVisible={this.state.isModalAdVisible} >
@@ -265,8 +263,8 @@ class Address extends React.Component {
           </View>
           <View style={styles.flatList}>
             <FlatList
-              data={this.state.dataSource}
-              keyExtractor={(item) => item.Id.toString()}
+              data={this.props.dataAddress}
+              keyExtractor={(item) => item.id.toString()}
               renderItem={({item}) => <AddressItem address={item} deleteAddress={this._deleteAddress}/>}
             />
           </View>
@@ -371,7 +369,10 @@ const styles = StyleSheet.create({
 const mapStateToPros = (state) => {
   return {
     email: state.email,
-    connected: state.connected
+    connected: state.connected,
+    dataAddress : state.dataAddress,
+    addressEmpty : state.addressEmpty,
+    nbAddress : state.nbAddress,
   }
 }
 

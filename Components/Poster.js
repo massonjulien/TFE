@@ -1,34 +1,77 @@
 import { connect } from 'react-redux'
 import React from 'react'
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-
+import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native'
+import AnnonceItem from './Item/AnnonceItem'
 
 class Poster extends React.Component {
+
+  constructor(props) {
+  super(props);
+  this.state = {
+      annonceEmpty : true, nbAnnonce : 0,
+    };
+  }
+
+  _displayDetailAnnonce = (id) => {
+    this.props.navigation.navigate("AnnonceDetail", { id: id })
+  }
+
 
   render() {
 
       if(this.props.connected){
-        return (
-          <View style={styles.container}>
-            <View style={styles.firstContainer}>
-              <Text style={styles.Title}>Mes annonces</Text>
+        if(this.props.annonceEmpty){
+          return (
+            <View style={styles.container}>
+              <View style={styles.firstContainer}>
+                <Text style={styles.Title}>Mes annonces</Text>
+              </View>
+              <View style={styles.flatContainer}>
+                <Text>Vous n'avez pas d'annonces en cours </Text>
+              </View>
+              <View style={styles.lastContainer}>
+                <TouchableOpacity
+                  activeOpacity = { 0.8 } style = { styles.Btn }
+                  onPress = {() => this.props.navigation.navigate("NewPost")}>
+                    <Text style = { styles.btnText }>Nouvelle annonce</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity = { 0.8 } style = { styles.Btn }
+                  onPress = {() => this.props.navigation.navigate("Address")}>
+                    <Text style = { styles.btnText }>Mes Adresses</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.flatContainer}>
+          )
+        } else {
+          return (
+            <View style={styles.container}>
+              <View style={styles.firstContainer}>
+                <Text style={styles.Title}>Mes annonces</Text>
+              </View>
+              <View style={styles.flatContainer}>
+                <FlatList
+                  data={this.props.dataAnnonce}
+                  keyExtractor={(item) => item.id.toString()}
+                  renderItem={({item}) => <AnnonceItem displayDetailAnnonce={this._displayDetailAnnonce} annonce={item}/>}
+                />
+              </View>
+              <View style={styles.lastContainer}>
+                <TouchableOpacity
+                  activeOpacity = { 0.8 } style = { styles.Btn }
+                  onPress = {() => this.props.navigation.navigate("NewPost")}>
+                    <Text style = { styles.btnText }>Nouvelle annonce</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity = { 0.8 } style = { styles.Btn }
+                  onPress = {() => this.props.navigation.navigate("Address")}>
+                    <Text style = { styles.btnText }>Mes Adresses</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <View style={styles.lastContainer}>
-              <TouchableOpacity
-                activeOpacity = { 0.8 } style = { styles.Btn }
-                onPress = {() => this.props.navigation.navigate("NewPost")}>
-                  <Text style = { styles.btnText }>Nouvelle annonce</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity = { 0.8 } style = { styles.Btn }
-                onPress = {() => this.props.navigation.navigate("Address")}>
-                  <Text style = { styles.btnText }>Mes Adresses</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )
+          )
+        }
+
       } else {
         return (
           <View style={styles.containerUnconnected}><Text style={styles.txUnconnected}>Vous devez être connecté pour pouvoir poster une annonce !</Text></View>
@@ -88,7 +131,9 @@ const styles = StyleSheet.create({
 const mapStateToPros = (state) => {
   return {
     email: state.email,
-    connected: state.connected
+    connected: state.connected,
+    dataAnnonce : state.dataAnnonce,
+    annonceEmpty : state.annonceEmpty,
   }
 }
 export default connect(mapStateToPros)(Poster)
