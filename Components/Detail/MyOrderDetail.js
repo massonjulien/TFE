@@ -34,6 +34,7 @@ class MyOrderDetail extends React.Component {
 
 
   componentDidMount() {
+    console.log(this.props.navigation.state.params.idadvert);
     console.log(this.props.navigation.state.params.id);
     console.log(this.props.email);
     return fetch('https://olitot.com/DB/INC/postgres.php', {
@@ -54,9 +55,9 @@ class MyOrderDetail extends React.Component {
     }).then((response) => response.json()).then((responseJson) => {
         //this.countQteDisp(responseJson.qtavaible)
         this.setState({
-          food : responseJson
+          food : responseJson[0]
         });
-        console.log(responseJson);
+        console.log(responseJson[0]);
 
       })
       .catch((error) => {
@@ -87,22 +88,15 @@ class MyOrderDetail extends React.Component {
           </View>
           <View style={styles.data_container}>
             <View style={styles.txt_profil}>
-
-            </View>
-            <View style={styles.cmd}>
-              <Picker
-                selectedValue={this.state.qte}
-                style={{height: 50, width: 300}}
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({qte: itemValue})
-                }>
-                {qteDispItems}
-              </Picker>
-              <TouchableOpacity
-                activeOpacity = { 0.8 } style = { styles.btn }
-                onPress={this.commander}>
-                  <Text style = { styles.btnText }>Commander</Text>
-              </TouchableOpacity>
+                <Text style={styles.identity}>{food.firstname} {food.lastname}{"\n"}</Text>
+                <View style={styles.container_plat}>
+                  <Text style={styles.identity}>{food.name}</Text>
+                  <Text style={styles.description}>{food.description}</Text>
+                  <Text style={styles.identity}>Vous avez commandé {food.qtbought} parts</Text>
+                </View>
+                <Text style={styles.identity}>Coordonnées du vendeur</Text>
+                <Text style={styles.coordonnees}>{food.phone} </Text>
+                <Text style={styles.coordonnees}>{food.address} {food.number}, {food.city} {food.zip}</Text>
             </View>
           </View>
 
@@ -130,13 +124,13 @@ const styles = StyleSheet.create({
   },
   image_container : {
     flex : 3,
-    borderBottomColor : 'grey',
-    borderBottomWidth : 2.5,
+    borderBottomColor : 'black',
+    borderBottomWidth : 1,
     alignItems: 'center',
   },
   data_container : {
     flex : 5,
-    paddingTop: 100,
+    paddingTop: 20,
   },
   image : {
     height: '100%',
@@ -144,28 +138,20 @@ const styles = StyleSheet.create({
     position : 'absolute',
   },
   profil : {
-    borderWidth:2.5,
-    borderColor:'grey',
+    borderWidth:1,
+    borderColor:'black',
     alignItems:'center',
     justifyContent:'center',
     width:100,
     height:100,
     backgroundColor:'#fff',
     borderRadius:50,
-    marginTop : '42%',
+    marginTop : '51%',
   },
   txt_profil : {
+    //marginHorizontal : '2%',
     flex : 1,
-    flexDirection: 'row'
-  },
-  cmd : {
-    flex : 1
-  },
-  profil_name : {
-    flex : 1,
-  },
-  profil_rate : {
-    flex : 1,
+    marginBottom : '12%',
   },
   rate : {
     width : 20,
@@ -176,6 +162,9 @@ const styles = StyleSheet.create({
       color: 'white',
       fontSize: 16
   },
+  description : {
+    marginHorizontal : '2%',
+  },
   btn : {
     marginHorizontal : 5,
     backgroundColor: 'rgba(0,0,0,0.6)',
@@ -183,6 +172,26 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 10,
     marginBottom : 10,
+  },
+  identity : {
+    color : 'grey',
+    fontSize : 18,
+    marginHorizontal : '2%',
+  },
+  coordonnees : {
+    marginLeft : '10%',
+    fontSize : 16,
+    marginHorizontal : '2%',
+  },
+  container_plat : {
+    marginTop : '5%',
+    marginBottom : '5%',
+    paddingTop : '5%',
+    paddingBottom : '5%',
+    borderTopColor : 'grey',
+    borderTopWidth : 1,
+    borderBottomColor : 'grey',
+    borderBottomWidth : 1,
   }
 
 })

@@ -68,9 +68,9 @@ class FoodDetail extends React.Component {
   }
 
   commander = () => {
-    console.log(this.props.navigation.state.params.id);
-    console.log(this.props.email);
-    console.log(this.state.qte);
+    //console.log(this.props.navigation.state.params.id);
+    //console.log(this.props.email);
+    //console.log(this.state.qte);
     this.componentDidMount();
     if(this.props.email == 'null'){
       alert('Vous devez être connecté pour pouvoir commander!');
@@ -141,26 +141,37 @@ class FoodDetail extends React.Component {
             />
           </View>
           <View style={styles.data_container}>
-            <View style={styles.txt_profil}>
-
-            </View>
-            <View style={styles.cmd}>
-              <Picker
-                selectedValue={this.state.qte}
-                style={{height: 50, width: 300}}
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({qte: itemValue})
-                }>
-                {qteDispItems}
-              </Picker>
-              <TouchableOpacity
-                activeOpacity = { 0.8 } style = { styles.btn }
-                onPress={this.commander}>
-                  <Text style = { styles.btnText }>Commander</Text>
-              </TouchableOpacity>
+            <ScrollView style={styles.scroll_container}>
+              <View style={styles.rate_container}>
+                <Image
+                  style={styles.rate}
+                  source={this.rate(food.rate)}
+                />
+              </View>
+              <View style={styles.txt_profil}>
+                <Text style={styles.identity}>{food.name}</Text>
+                <Text style={styles.description}>{food.description}</Text>
+                <Text style={styles.identity}>{food.price}€ / parts</Text>
+              </View>
+              <View style={styles.cmd}>
+                <Picker
+                  selectedValue={this.state.qte}
+                  style={{height: 50, width: 300}}
+                  onValueChange={(itemValue, itemIndex) =>
+                    this.setState({qte: itemValue})
+                  }>
+                  {qteDispItems}
+                </Picker>
+              </View>
+            </ScrollView>
+            <View style={styles.last_container}>
+            <TouchableOpacity
+              activeOpacity = { 0.8 } style = { styles.btn }
+              onPress={this.commander}>
+                <Text style = { styles.btnText }>Commander</Text>
+            </TouchableOpacity>
             </View>
           </View>
-
         </View>
       )
     }
@@ -183,15 +194,19 @@ const styles = StyleSheet.create({
   main_container : {
     flex : 1,
   },
+  last_container : {
+    flex : 2,
+    marginBottom : '4%'
+  },
   image_container : {
     flex : 3,
-    borderBottomColor : 'grey',
-    borderBottomWidth : 2.5,
+    borderBottomColor : 'black',
+    borderBottomWidth : 1,
     alignItems: 'center',
   },
   data_container : {
     flex : 5,
-    paddingTop: 100,
+    marginTop: '15%',
   },
   image : {
     height: '100%',
@@ -199,32 +214,40 @@ const styles = StyleSheet.create({
     position : 'absolute',
   },
   profil : {
-    borderWidth:2.5,
-    borderColor:'grey',
+    borderWidth:1,
+    borderColor:'black',
     alignItems:'center',
     justifyContent:'center',
     width:100,
     height:100,
     backgroundColor:'#fff',
     borderRadius:50,
-    marginTop : '42%',
+    marginTop : '47%',
   },
   txt_profil : {
-    flex : 1,
-    flexDirection: 'row'
+    marginHorizontal : '2%',
+  },
+  identity : {
+    fontSize : 18,
+    color: 'grey',
+    marginBottom : '5%',
   },
   cmd : {
-    flex : 1
-  },
-  profil_name : {
-    flex : 1,
+    marginTop : '2%',
+    borderTopColor : 'black',
+    borderTopWidth : 1
   },
   profil_rate : {
     flex : 1,
   },
+  rate_container : {
+    alignItems:'center',
+    marginBottom : '5%',
+  },
   rate : {
-    width : 20,
-    height : 23,
+    width : 150,
+    height : 28,
+    alignItems:'center',
   },
   btnText: {
       textAlign: 'center',
@@ -237,7 +260,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     padding: 10,
     marginTop: 10,
-    marginBottom : 10,
+    marginBottom : '5%',
   }
 
 })

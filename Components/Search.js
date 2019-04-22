@@ -9,12 +9,34 @@ class Recherche extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-       dataSource : [], isFetching: false,
+       dataSource : [], isFetching: false, searchedText : '',
       };
   }
 
-  _search = () => {
-
+  search(){
+    if(this.state.searchedText.length > 0 ){
+      return fetch('https://olitot.com/DB/INC/postgres.php', {
+        method: 'POST',
+        headers:
+        {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+        {
+          action : 'getSearchText',
+          text : this.state.searchedText
+        })
+      }).then((response) => response.json()).then((responseJson) => {
+          console.log(responseJson);
+          this.setState({
+            dataSource : responseJson
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   }
 
   _displayDetailFood = (id) => {
@@ -25,7 +47,7 @@ class Recherche extends React.Component {
   onRefresh() {
        this.setState({ isFetching: true }, function() { this.componentDidMount() });
        this.setState({ isFetching: false });
-    }
+  }
 
   componentDidMount() {
     return fetch('https://olitot.com/DB/INC/postgres.php', {
@@ -37,8 +59,7 @@ class Recherche extends React.Component {
       },
       body: JSON.stringify(
       {
-        action : 'getSearch',
-        email : this.props.email
+        action : 'getSearch'
       })
     }).then((response) => response.json()).then((responseJson) => {
         this.setState({
@@ -48,17 +69,16 @@ class Recherche extends React.Component {
       .catch((error) => {
         console.error(error);
       });
-
   }
 
   render() {
       return (
         <View style={styles.mainContainer}>
           <View style={styles.headerContainer}>
-            <TextInput style={styles.textInput} placeholder='Localité'/>
+            <TextInput onSubmitEditing={() => this.search()} onChangeText={(text) => this.setState({searchedText : text})} style={styles.textInput} placeholder='Localité'/>
             <TouchableOpacity
               activeOpacity = { 0.8 } style = { styles.Btn }
-              onPress={this.search}>
+              onPress={() => this.search()}>
                 <Text style = { styles.btnText }>Rechercher</Text>
             </TouchableOpacity>
           </View>

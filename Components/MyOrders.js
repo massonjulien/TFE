@@ -15,7 +15,8 @@ class MyOrders extends React.Component {
   }
 
   _displayDetailOrder = (idadvert, id) => {
-      console.log(id);
+      //console.log(id);
+      //console.log(idadvert);
       this.props.navigation.navigate("MyOrderDetail", { idadvert: idadvert, id : id});
   }
 
@@ -45,7 +46,7 @@ class MyOrders extends React.Component {
 
     }).then((response) => response.json()).then((responseJson) => {
         if(responseJson != false ){
-          console.log(responseJson);
+          //console.log(responseJson);
           this._connectionReducer(responseJson, 'myOrders');
         } else {
 

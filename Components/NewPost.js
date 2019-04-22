@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import React from 'react'
-import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, Picker, Image } from 'react-native'
-
+import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, Picker, Image, ScrollView } from 'react-native'
+import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
 
 class NewPost extends React.Component {
 
@@ -16,40 +16,51 @@ class NewPost extends React.Component {
   }
 
   saveData = () => {
-    if(this.state.nom != '' && this.state.description != '' && this.state.prix != '' && this.state.qte != ''){
-      this.setState({ loading: true, disabled: true }, () =>
-      {
-          fetch('https://olitot.com/DB/INC/postgres.php',
-          {
-              method: 'POST',
-              headers:
-              {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(
-              {
-                action :'addAdvert',
-                email : this.props.email,
-                nom : this.state.nom,
-                description : this.state.description,
-                prix : this.state.prix,
-                qte : this.state.qte,
-              })
+    console.log(this.state.value);
+    if(this.state.value == undefined){
+      alert("Choissisez une adresse pour l'annonce!");
+    } else {
+      if(this.state.nom != '' && this.state.description != '' && this.state.prix != '' && this.state.qte != ''){
+        this.setState({ loading: true, disabled: true }, () =>
+        {
+            fetch('https://olitot.com/DB/INC/postgres.php',
+            {
+                method: 'POST',
+                headers:
+                {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(
+                {
+                  action :'addAdvert',
+                  email : this.props.email,
+                  nom : this.state.nom,
+                  description : this.state.description,
+                  prix : this.state.prix,
+                  qte : this.state.qte,
+                  idAddress : this.state.value
+                })
 
-          }).then((response) => response.json()).then((responseJson) =>
-          {
-              this.annonce();
-              this.setState({nom : '', description : '', prix : '', qte : '' }, () => this.props.navigation.navigate("Poster"));
-          }).catch((error) =>
-          {
-              //alert(error);
-              console.error(error);
-              this.setState({ loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
-          });
-      });
-    }else{
-      alert('Please enter all values!');
+            }).then((response) => response.json()).then((responseJson) =>
+            {
+                if(responseJson == true){
+                  this.annonce();
+                  this.setState({nom : '', description : '', prix : '', qte : '' }, () => this.props.navigation.navigate("Poster"));
+                } else {
+                  alert("une erreur s'est produite");
+                }
+
+            }).catch((error) =>
+            {
+                //alert(error);
+                console.error(error);
+                this.setState({ loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
+            });
+        });
+      }else{
+        alert('Tous les champs doivent être remplis');
+      }
     }
   }
 
@@ -77,14 +88,34 @@ class NewPost extends React.Component {
       });
     }
 
+  listingAddress(){
+    var arr = [];
+    if(this.props.nbAddress > 0){
+      for(var i =0; i < this.props.nbAddress; i++){
+        var temp = '';
+        temp += this.props.address[i].address;
+        temp += this.props.address[i].number;
+        temp += ', ' + this.props.address[i].zip;
+        arr.push({label: temp, value:this.props.address[i].id});
+      }
+      return arr;
+    }
+
+  }
+
 
   render() {
+    var radio_props = this.listingAddress();
+    //console.log(radio);
+    //console.log(this.props.address);
+
+
     return (
       <View style={styles.container}>
         <View style={styles.firstContainer}>
           <Text style={styles.Title}>Nouvelle annonce</Text>
         </View>
-        <View style={styles.main}>
+        <ScrollView style={styles.main}>
           <View style={styles.containerImg}>
             <TouchableOpacity style={styles.image} onPress={() => {}}>
               <Image
@@ -141,22 +172,31 @@ class NewPost extends React.Component {
               onChangeText = {(text) => this.setState({ prix: text })}
             />
           </View>
-        </View>
-        <View style={styles.lastContainer}>
-          <TouchableOpacity
-            disabled = { this.state.disabled }
-            activeOpacity = { 0.8 } style = { styles.Btn }
-            onPress = {this.saveData}>
-              <Text style = { styles.btnText }>Ajouter</Text>
-          </TouchableOpacity>
+          <View style={styles.address_container}>
+            <RadioForm
+              radio_props={radio_props}
+              initial= {-1}
+              buttonColor={'#000000'}
+              selectedButtonColor={'#000000'}
+              onPress={(value) => {this.setState({value:value})}}
+            />
+          </View>
+          <View style={styles.lastContainer}>
+            <TouchableOpacity
+              disabled = { this.state.disabled }
+              activeOpacity = { 0.8 } style = { styles.Btn }
+              onPress = {this.saveData}>
+                <Text style = { styles.btnText }>Ajouter</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              disabled = { this.state.disabled }
+              activeOpacity = { 0.8 } style = { styles.Btn }
+              onPress = {() => this.props.navigation.navigate("Poster") }>
+                <Text style = { styles.btnText }>Retour</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
 
-          <TouchableOpacity
-            disabled = { this.state.disabled }
-            activeOpacity = { 0.8 } style = { styles.Btn }
-            onPress = {() => this.props.navigation.navigate("Poster") }>
-              <Text style = { styles.btnText }>Retour</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     )
   }
@@ -172,10 +212,10 @@ const styles = StyleSheet.create({
   },
   firstContainer : {
     marginTop : 30,
-    flex : 1,
+    height : '5%',
   },
   main : {
-    flex : 4,
+    height : '80%',
   },
   prix : {
     fontSize : 17,
@@ -240,12 +280,17 @@ const styles = StyleSheet.create({
       color: 'grey',
       marginBottom: 10
   },
+  address_container : {
+    paddingTop : '4%'
+  }
 })
 
 const mapStateToPros = (state) => {
   return {
     email: state.email,
-    connected: state.connected
+    connected: state.connected,
+    address: state.dataAddress,
+    nbAddress : state.nbAddress
   }
 }
 

@@ -54,6 +54,7 @@ class AnnonceDetail extends React.Component {
             <Text style={styles.plat}>{annonce.name}</Text>
             <Text style={styles.prix}>{annonce.price}€/Part</Text>
             <Text style={styles.qt}>{annonce.qtavaible} / {annonce.qttotal} restantes</Text>
+            <Text style={styles.qt}>{annonce.address} {annonce.number}, {annonce.city} {annonce.zip}</Text>
             <Text style={styles.desc}>{annonce.description}</Text>
           </View>
         </View>
