@@ -102,6 +102,7 @@ class FoodDetail extends React.Component {
               }
               this.setState({qte : 0})
               this.componentDidMount();
+      
           }).catch((error) =>
           {
               console.error(error);
@@ -124,10 +125,15 @@ class FoodDetail extends React.Component {
     {/* ici on définit une constante nommé film qui sera égale a this.state.film donc au lieu de faire
         this.state.film.qqchose on peut juste faire film.qqchose */}
     const { food } = this.state
+
     let qteDispItems = this.state.qteArray.map( (i) => {
         return <Picker.Item key={i} value={i} label={i.toString()} />
     });
     if (this.state.food != undefined) {
+      hour = food.date;
+      hour = hour.split('__');
+      var beginHour = hour[1];
+      var endHour = hour[2];
       return (
         <View style={styles.main_container}>
           <View style={styles.image_container}>
@@ -141,7 +147,7 @@ class FoodDetail extends React.Component {
             />
           </View>
           <View style={styles.data_container}>
-            <ScrollView style={styles.scroll_container}>
+            <ScrollView fillViewport="true" style={styles.scroll_container}>
               <View style={styles.rate_container}>
                 <Image
                   style={styles.rate}
@@ -152,6 +158,7 @@ class FoodDetail extends React.Component {
                 <Text style={styles.identity}>{food.name}</Text>
                 <Text style={styles.description}>{food.description}</Text>
                 <Text style={styles.identity}>{food.price}€ / parts</Text>
+                <Text style={styles.identity}>Disponible de {beginHour} à {endHour}</Text>
               </View>
               <View style={styles.cmd}>
                 <Picker

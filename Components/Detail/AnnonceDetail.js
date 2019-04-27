@@ -2,14 +2,14 @@
 
 import React from 'react'
 import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image } from 'react-native'
-
+import { CheckBox } from 'react-native-elements'
 
 class AnnonceDetail extends React.Component {
 
   constructor(props){
     super(props)
     this.state = {
-      annonce : undefined
+      annonce : undefined, buyer : [], checked : true,
     }
   }
 
@@ -28,9 +28,54 @@ class AnnonceDetail extends React.Component {
         })
 
     }).then((response) => response.json()).then((responseJson) => {
+      console.log(responseJson);
         this.setState({
-          annonce : responseJson[0]
+          annonce : responseJson[0],
+          buyer : responseJson,
         });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  buyerListing(resp){
+    var temp = [];
+    for(var i = 0; i < resp.length; i++){
+      var act = resp[i];
+      if(act.validatedsender == 'true'){
+        var bool = true;
+      } else {
+        var bool = false;
+      }
+      if(act.emailbuyer != null){
+        temp.push({'id': act.reservid,'idAdvert' : act.id, 'txt' : act.emailbuyer + ", " + act.qtbought + " parts achetée(s)", 'checked' : bool});
+      }
+    }
+    return temp;
+  }
+
+  checkSender(id){
+    return fetch('https://olitot.com/DB/INC/postgres.php', {
+        method: 'POST',
+        headers:
+        {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+        {
+          action : 'checkReservation',
+          id : id,
+          who : 'sender'
+        })
+
+    }).then((response) => response.json()).then((responseJson) => {
+        if(responseJson == true){
+          this.componentDidMount();
+        } else {
+          alert("Une erreur s'est produite");
+        }
       })
       .catch((error) => {
         console.error(error);
@@ -40,7 +85,11 @@ class AnnonceDetail extends React.Component {
   _displayAnnonce() {
     {/* ici on définit une constante nommé film qui sera égale a this.state.film donc au lieu de faire
         this.state.film.qqchose on peut juste faire film.qqchose */}
-    const { annonce } = this.state
+    const { annonce } = this.state;
+    let arrB = this.buyerListing(this.state.buyer);
+    const arrBText = arrB.map((type)=> <CheckBox key={type['id']} style={styles.checkbox} checked={type['checked']} onPress={() => this.checkSender(type['id'])} title={type['txt']}/>)
+
+    //console.log(this.state.buyer);
     if (this.state.annonce != undefined) {
       return (
         <View style={styles.main_container}>
@@ -56,6 +105,9 @@ class AnnonceDetail extends React.Component {
             <Text style={styles.qt}>{annonce.qtavaible} / {annonce.qttotal} restantes</Text>
             <Text style={styles.qt}>{annonce.address} {annonce.number}, {annonce.city} {annonce.zip}</Text>
             <Text style={styles.desc}>{annonce.description}</Text>
+          </View>
+          <View style={styles.container_buyers}>
+            {arrBText}
           </View>
         </View>
       )
@@ -76,6 +128,9 @@ const styles = StyleSheet.create({
   main : {
     flex : 1,
   },
+  checkbox : {
+    padding : 25
+  },
   main_container : {
     flex : 1,
   },
@@ -89,6 +144,12 @@ const styles = StyleSheet.create({
     flex : 2,
     borderBottomColor : 'black',
     borderBottomWidth : 1,
+  },
+  container_buyers : {
+    borderTopColor : 'black',
+    borderTopWidth : 1,
+    paddingHorizontal : 20,
+    flex : 4,
   },
   image : {
     flex : 1
@@ -110,6 +171,10 @@ const styles = StyleSheet.create({
   desc : {
     color : 'grey',
     marginTop : 10,
+  },
+  buyers : {
+    color : 'grey',
+    fontSize : 20,
   }
 
 

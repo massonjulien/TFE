@@ -1,13 +1,14 @@
 import { connect } from 'react-redux'
-import React from 'react'
+import React, { Component } from 'react'
 import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity, Picker, Image, ScrollView } from 'react-native'
-import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
+import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button'
+import DatePicker from 'react-native-datepicker'
 
 class NewPost extends React.Component {
 
   constructor(){
       super();
-      this.state = {nom : '', qte : '0', description :'', photo : '', prix : ''}
+      this.state = {nom : '', qte : '0', description :'', photo : '', prix : '', endHour : '00:00', beginHour : '00:00', date : ''}
   }
 
   _connectionReducer(data, value){
@@ -16,52 +17,88 @@ class NewPost extends React.Component {
   }
 
   saveData = () => {
+
+    console.log('date : ' + this.state.date);
+    console.log('beginHour : ' + this.state.beginHour);
+    console.log('endHour : ' + this.state.endHour);
+
     console.log(this.state.value);
-    if(this.state.value == undefined){
-      alert("Choissisez une adresse pour l'annonce!");
+    if(this.state.date == ''){
+      alert('Veuillez selectionner une date')
     } else {
-      if(this.state.nom != '' && this.state.description != '' && this.state.prix != '' && this.state.qte != ''){
-        this.setState({ loading: true, disabled: true }, () =>
-        {
-            fetch('https://olitot.com/DB/INC/postgres.php',
-            {
-                method: 'POST',
-                headers:
-                {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(
-                {
-                  action :'addAdvert',
-                  email : this.props.email,
-                  nom : this.state.nom,
-                  description : this.state.description,
-                  prix : this.state.prix,
-                  qte : this.state.qte,
-                  idAddress : this.state.value
-                })
+      if(this.state.beginHour == ''){
+        alert("Veuillez selectionner le début de l'heure de retrait")
+      } else {
+        if(this.state.endHour == ''){
+          alert("Veuillez selectionner la fin de l'heure de retrait")
+        } else {
+          var beginHour = this.state.beginHour;
+          xb = beginHour.split(':');
+          yb = parseInt(xb[0]) + (parseInt(xb[1])/100);
+          yb = yb + 1;
+          console.log(yb);
 
-            }).then((response) => response.json()).then((responseJson) =>
-            {
-                if(responseJson == true){
-                  this.annonce();
-                  this.setState({nom : '', description : '', prix : '', qte : '' }, () => this.props.navigation.navigate("Poster"));
-                } else {
-                  alert("une erreur s'est produite");
-                }
+          var endHour = this.state.endHour;
+          xe = endHour.split(':');
+          ye = parseInt(xe[0]) + (parseInt(xe[1])/100);
+          console.log(ye);
 
-            }).catch((error) =>
-            {
-                //alert(error);
-                console.error(error);
-                this.setState({ loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
-            });
-        });
-      }else{
-        alert('Tous les champs doivent être remplis');
+          if(yb > ye){
+          	alert('Il doit y avoir au moins heure heure de retrait')
+          } else {
+            if(this.state.value == undefined){
+              alert("Choissisez une adresse pour l'annonce!");
+            } else {
+              if(this.state.nom != '' && this.state.description != '' && this.state.prix != '' && this.state.qte != ''){
+                this.setState({ loading: true, disabled: true }, () =>
+                {
+                    fetch('https://olitot.com/DB/INC/postgres.php',
+                    {
+                        method: 'POST',
+                        headers:
+                        {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(
+                        {
+                          action :'addAdvert',
+                          email : this.props.email,
+                          nom : this.state.nom,
+                          description : this.state.description,
+                          prix : this.state.prix,
+                          qte : this.state.qte,
+                          idAddress : this.state.value,
+                          date : this.state.date,
+                          begin : this.state.beginHour,
+                          end : this.state.endHour,
+                        })
+
+                    }).then((response) => response.json()).then((responseJson) =>
+                    {
+                        if(responseJson == true){
+                          this.annonce();
+                          this.setState({nom : '', description : '', prix : '', qte : '' }, () => this.props.navigation.navigate("Poster"));
+                        } else {
+                          alert("une erreur s'est produite");
+                        }
+
+                    }).catch((error) =>
+                    {
+                        //alert(error);
+                        console.error(error);
+                        this.setState({ loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
+                    });
+                });
+              } else {
+                alert('Tous les champs doivent être remplis');
+              }
+            }
+          }
+        }
       }
     }
+
   }
 
   annonce() {
@@ -103,13 +140,52 @@ class NewPost extends React.Component {
 
   }
 
+  todaysDate(){
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+    if(dd<10) {
+        dd = '0'+dd
+    }
+    if(mm<10) {
+        mm = '0'+mm
+    }
+    today = dd + '/' + mm + '/' + yyyy;
+
+    return today;
+  }
+
+  maxDate(){
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+    switch(mm){
+      case 12 :
+        mm = 2;
+        break;
+      case 11 :
+        mm = 1;
+        break;
+      default :
+        mm = mm + 2;
+        break;
+    }
+    if(dd<10) {
+        dd = '0'+dd
+    }
+    if(mm<10) {
+        mm = '0'+mm
+    }
+    return today = dd + '/' + mm + '/' + yyyy;
+  }
+
 
   render() {
     var radio_props = this.listingAddress();
-    //console.log(radio);
-    //console.log(this.props.address);
-
-
+    var todaysDate = this.todaysDate();
+    var maxDate = this.maxDate();
     return (
       <View style={styles.container}>
         <View style={styles.firstContainer}>
@@ -179,6 +255,79 @@ class NewPost extends React.Component {
               buttonColor={'#000000'}
               selectedButtonColor={'#000000'}
               onPress={(value) => {this.setState({value:value})}}
+            />
+          </View>
+          <View style={styles.date_container}>
+            <Text>Date de l'annonce</Text>
+            <DatePicker
+              style={{width: 200}}
+              mode="date"
+              date={this.state.date}
+              placeholder="selectionnez une date"
+              format="DD-MM-YYYY"
+              minDate={todaysDate}
+              maxDate={maxDate}
+              confirmBtnText="Confirm"
+              cancelBtnText="Cancel"
+              customStyles={{
+                dateIcon: {
+                  position: 'absolute',
+                  left: 0,
+                  top: 4,
+                  marginLeft: 0
+                },
+                dateInput: {
+                  marginLeft: 36
+                }
+                // ... You can check the source to find the other keys.
+              }}
+              onDateChange={(date) => {this.setState({date: date})}}
+            />
+            <Text>Début du retrait</Text>
+            <DatePicker
+              style={{width: 200}}
+              mode="time"
+              date={this.state.beginHour}
+              minDate="09:00"
+              maxDate="23:59"
+              confirmBtnText="Confirm"
+              cancelBtnText="Cancel"
+              customStyles={{
+                dateIcon: {
+                  position: 'absolute',
+                  left: 0,
+                  top: 4,
+                  marginLeft: 0
+                },
+                dateInput: {
+                  marginLeft: 36
+                }
+                // ... You can check the source to find the other keys.
+              }}
+              onDateChange={(hour) => {this.setState({beginHour: hour})}}
+            />
+            <Text>Fin du retrait</Text>
+            <DatePicker
+              style={{width: 200}}
+              mode="time"
+              date={this.state.endHour}
+              minDate="09:00"
+              maxDate="23:59"
+              confirmBtnText="Confirm"
+              cancelBtnText="Cancel"
+              customStyles={{
+                dateIcon: {
+                  position: 'absolute',
+                  left: 0,
+                  top: 4,
+                  marginLeft: 0
+                },
+                dateInput: {
+                  marginLeft: 36
+                }
+                // ... You can check the source to find the other keys.
+              }}
+              onDateChange={(hour) => {this.setState({endHour: hour})}}
             />
           </View>
           <View style={styles.lastContainer}>
@@ -281,7 +430,9 @@ const styles = StyleSheet.create({
       marginBottom: 10
   },
   address_container : {
-    paddingTop : '4%'
+    paddingTop : '4%',
+    borderBottomColor : 'black',
+    borderBottomWidth : 1,
   }
 })
 

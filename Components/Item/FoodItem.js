@@ -26,11 +26,32 @@ class FoodItem extends React.Component {
     }
   }
 
+  todaysDate(){
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth()+1; //January is 0!
+    var yyyy = today.getFullYear();
+    if(dd<10) {
+        dd = '0'+dd
+    }
+    if(mm<10) {
+        mm = '0'+mm
+    }
+    today = dd + '-' + mm + '-' + yyyy;
 
+    return today;
+  }
 
   render() {
     const { food, displayDetailFood } = this.props
-    if(food.qtavaible > 0){
+    var hour = food.date;
+    var today = this.todaysDate();
+    console.log(today);
+    hour = hour.split('__');
+    var beginHour = hour[1];
+    var endHour = hour[2];
+    console.log(hour[0])
+    if(food.qtavaible > 0 && hour[0] == today){
       return (
         <TouchableOpacity
           style={styles.main_container}
@@ -42,15 +63,15 @@ class FoodItem extends React.Component {
           <View style={styles.content_container}>
             <View style={styles.header_container}>
               <Text style={styles.title_text}>{food.name}</Text>
-              <Text style={styles.nbPart}>{food.price}€</Text>
+              <Text style={styles.rate}>Rate {food.rate}/5</Text>
             </View>
             <View style={styles.bodyContainer}>
               <Text style={styles.auteur}>{food.firstname} {food.lastname }</Text>
-              <Image
-                style={styles.rate}
-                source={this.rate(food.rate)}
-              />
+              <Text style={styles.nbPart}>{food.qtavaible} part(s) disponible à {food.price}€/part</Text>
               {/* La propriété numberOfLines permet de couper un texte si celui-ci est trop long, il suffit de définir un nombre maximum de ligne */}
+            </View>
+            <View style={styles.horaireContainer}>
+              <Text style={styles.nbPart}>Take away de {beginHour} à {endHour}</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -68,6 +89,9 @@ const styles = StyleSheet.create({
   main_container: {
     height: 130,
     flexDirection: 'row'
+  },
+  horaireContainer : {
+    flex : 3,
   },
   image: {
     width: 120,
@@ -92,7 +116,7 @@ const styles = StyleSheet.create({
   title_text: {
     fontWeight: 'bold',
     fontSize: 20,
-    flex: 1,
+    flex: 4,
     flexWrap: 'wrap',
     paddingRight: 5
   },
@@ -102,8 +126,7 @@ const styles = StyleSheet.create({
     color: '#666666'
   },
   bodyContainer: {
-    flex: 7,
-    flexDirection: 'row'
+    flex: 3,
   },
   auteur: {
     fontStyle: 'italic',
@@ -111,9 +134,8 @@ const styles = StyleSheet.create({
     flex: 3
   },
   rate: {
-    flex: 4,
-    width: 20,
-    height: 23
+    flex: 2,
+    fontSize : 15,
   },
   imageRate: {
 
