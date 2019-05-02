@@ -1,30 +1,12 @@
 // Components/FilmItem.js
 
 import React from 'react'
-import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native'
-
-
+import { StyleSheet, View, Text, Image, TouchableOpacity, Dimensions } from 'react-native'
+import { Rating, AirbnbRating } from 'react-native-ratings';
+import RF from "react-native-responsive-fontsize"
 
 
 class FoodItem extends React.Component {
-
-  rate(nb){
-    if(nb >= 0 && nb < 1){
-       return require('../../Image/noStar.jpg')
-    } else if(nb >= 1 && nb < 2){
-       return require('../../Image/oneStar.jpg')
-    } else if(nb >= 2 && nb < 3){
-       return require('../../Image/twoStar.jpg')
-    } else if(nb >= 3 && nb < 4){
-       return require('../../Image/threeStar.jpg')
-    } else if(nb >= 4 && nb < 5){
-       return require('../../Image/fourStar.jpg')
-    } else if(nb == 5){
-       return require('../../Image/fiveStar.jpg')
-    } else if (nb == -1 ) {
-
-    }
-  }
 
   todaysDate(){
     var today = new Date();
@@ -42,16 +24,19 @@ class FoodItem extends React.Component {
     return today;
   }
 
+  whichRate(rate){
+    if(rate != -1){
+        return <AirbnbRating isDisabled={true} count={5}  defaultRating={rate} showRating={false} size={15}/>
+    } else {
+        return <Text></Text>
+    }
+  }
+
   render() {
     const { food, displayDetailFood } = this.props
-    var hour = food.date;
     var today = this.todaysDate();
-    console.log(today);
-    hour = hour.split('__');
-    var beginHour = hour[1];
-    var endHour = hour[2];
-    console.log(hour[0])
-    if(food.qtavaible > 0 && hour[0] == today){
+    var rate = this.whichRate(food.rate);
+    if(food.qtavaible > 0 && food.date == today){
       return (
         <TouchableOpacity
           style={styles.main_container}
@@ -62,8 +47,12 @@ class FoodItem extends React.Component {
           />
           <View style={styles.content_container}>
             <View style={styles.header_container}>
-              <Text style={styles.title_text}>{food.name}</Text>
-              <Text style={styles.rate}>Rate {food.rate}/5</Text>
+              <View style={styles.header_container_one}>
+                  <Text style={styles.title_text}>{food.name}</Text>
+              </View>
+              <View style={styles.header_container_two}>
+                {rate}
+              </View>
             </View>
             <View style={styles.bodyContainer}>
               <Text style={styles.auteur}>{food.firstname} {food.lastname }</Text>
@@ -71,7 +60,7 @@ class FoodItem extends React.Component {
               {/* La propriété numberOfLines permet de couper un texte si celui-ci est trop long, il suffit de définir un nombre maximum de ligne */}
             </View>
             <View style={styles.horaireContainer}>
-              <Text style={styles.nbPart}>Take away de {beginHour} à {endHour}</Text>
+              <Text style={styles.nbPart}>Take away de {food.beginhour} à {food.endhour}</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -85,9 +74,10 @@ class FoodItem extends React.Component {
   }
 }
 
+
 const styles = StyleSheet.create({
   main_container: {
-    height: 130,
+    height: 150,
     flexDirection: 'row'
   },
   horaireContainer : {
@@ -111,18 +101,23 @@ const styles = StyleSheet.create({
   },
   header_container: {
     flex: 3,
-    flexDirection: 'row'
+  },
+  header_container_one : {
+    flex : 2,
+  },
+  header_container_two : {
+    flex : 1,
   },
   title_text: {
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: RF(2),
     flex: 4,
     flexWrap: 'wrap',
     paddingRight: 5
   },
   nbPart: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: RF(1.5),
     color: '#666666'
   },
   bodyContainer: {
@@ -135,7 +130,7 @@ const styles = StyleSheet.create({
   },
   rate: {
     flex: 2,
-    fontSize : 15,
+    fontSize : RF(1.5),
   },
   imageRate: {
 

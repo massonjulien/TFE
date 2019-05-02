@@ -16,9 +16,17 @@ class Poster extends React.Component {
     this.props.navigation.navigate("AnnonceDetail", { id: id })
   }
 
+  navigateToNewPost(){
+    console.log('coucou');
+    console.log(this.props.nbAddress);
+    if(this.props.nbAddress == undefined || this.props.nbAddress == 0){
+      alert("Vous devez d'abord réferencer une adresse pour pouvoir poster une annonce");
+    } else {
+      this.props.navigation.navigate("NewPost");
+    }
+  }
 
   render() {
-
       if(this.props.connected){
         if(this.props.annonceEmpty){
           return (
@@ -27,12 +35,12 @@ class Poster extends React.Component {
                 <Text style={styles.Title}>Mes annonces</Text>
               </View>
               <View style={styles.flatContainer}>
-                <Text>Vous n'avez pas d'annonces en cours </Text>
+                <Text>Vous n'avez pas d'annonces</Text>
               </View>
               <View style={styles.lastContainer}>
                 <TouchableOpacity
                   activeOpacity = { 0.8 } style = { styles.Btn }
-                  onPress = {() => this.props.navigation.navigate("NewPost")}>
+                  onPress = {() => this.navigateToNewPost()}>
                     <Text style = { styles.btnText }>Nouvelle annonce</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -59,7 +67,7 @@ class Poster extends React.Component {
               <View style={styles.lastContainer}>
                 <TouchableOpacity
                   activeOpacity = { 0.8 } style = { styles.Btn }
-                  onPress = {() => this.props.navigation.navigate("NewPost")}>
+                  onPress = {() => this.navigateToNewPost()}>
                     <Text style = { styles.btnText }>Nouvelle annonce</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -113,7 +121,7 @@ const styles = StyleSheet.create({
     flex : 7,
   },
   lastContainer : {
-    flex : 1,
+    flex : 2,
   },
   Btn: {
       backgroundColor: 'rgba(0,0,0,0.6)',
@@ -134,6 +142,7 @@ const mapStateToPros = (state) => {
     connected: state.connected,
     dataAnnonce : state.dataAnnonce,
     annonceEmpty : state.annonceEmpty,
+    nbAddress : state.nbAddress,
   }
 }
 export default connect(mapStateToPros)(Poster)

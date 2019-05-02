@@ -102,7 +102,7 @@ class FoodDetail extends React.Component {
               }
               this.setState({qte : 0})
               this.componentDidMount();
-      
+
           }).catch((error) =>
           {
               console.error(error);
@@ -130,10 +130,6 @@ class FoodDetail extends React.Component {
         return <Picker.Item key={i} value={i} label={i.toString()} />
     });
     if (this.state.food != undefined) {
-      hour = food.date;
-      hour = hour.split('__');
-      var beginHour = hour[1];
-      var endHour = hour[2];
       return (
         <View style={styles.main_container}>
           <View style={styles.image_container}>
@@ -158,7 +154,7 @@ class FoodDetail extends React.Component {
                 <Text style={styles.identity}>{food.name}</Text>
                 <Text style={styles.description}>{food.description}</Text>
                 <Text style={styles.identity}>{food.price}€ / parts</Text>
-                <Text style={styles.identity}>Disponible de {beginHour} à {endHour}</Text>
+                <Text style={styles.identity}>Disponible de {food.beginhour} à {food.endhour}</Text>
               </View>
               <View style={styles.cmd}>
                 <Picker

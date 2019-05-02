@@ -2,6 +2,7 @@
 import { connect } from 'react-redux'
 import React from 'react'
 import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image, Picker, Table, TouchableOpacity } from 'react-native'
+import Modal from "react-native-modal"
 import { CheckBox, Button } from 'react-native-elements'
 import { Rating, AirbnbRating } from 'react-native-ratings';
 
@@ -10,34 +11,11 @@ class MyOrderDetail extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      food : undefined, qteArray : [], qte : '', rate : undefined
+      food : undefined, qteArray : [], qte : '', rate : undefined, isModalError : false, isModalRate : false, isModalRateOk : false,
     }
   }
-
-  rate(nb){
-    if(nb >= 0 && nb < 1){
-       return require('../../Image/noStar.jpg')
-    } else if(nb >= 1 && nb < 2){
-       return require('../../Image/oneStar.jpg')
-    } else if(nb >= 2 && nb < 3){
-       return require('../../Image/twoStar.jpg')
-    } else if(nb >= 3 && nb < 4){
-       return require('../../Image/threeStar.jpg')
-    } else if(nb >= 4 && nb < 5){
-       return require('../../Image/fourStar.jpg')
-    } else if(nb == 5){
-       return require('../../Image/fiveStar.jpg')
-    } else if (nb == -1 ) {
-
-    }
-  }
-
-
 
   componentDidMount() {
-    console.log(this.props.navigation.state.params.idadvert);
-    console.log(this.props.navigation.state.params.id);
-    console.log(this.props.email);
     return fetch('https://olitot.com/DB/INC/postgres.php', {
         method: 'POST',
         headers:
@@ -58,7 +36,6 @@ class MyOrderDetail extends React.Component {
         this.setState({
           food : responseJson[0]
         });
-        console.log(responseJson[0]);
 
       })
       .catch((error) => {
@@ -66,38 +43,8 @@ class MyOrderDetail extends React.Component {
       });
   }
 
-  checkSender(id){
-      console.log(id);
-    return fetch('https://olitot.com/DB/INC/postgres.php', {
-        method: 'POST',
-        headers:
-        {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(
-        {
-          action : 'checkReservation',
-          id : id,
-          who : 'buyer'
-        })
-
-    }).then((response) => response.json()).then((responseJson) => {
-        if(responseJson == true){
-          this.componentDidMount();
-          alert("N'oubliez pas de noter votre cuisiniez après votre dégustation!")
-        } else {
-          alert("Une erreur s'est produite");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-
-  validateRate(){
-    if(this.state.rate != undefined){
-      console.log(this.props.navigation.state.params.id);
+  checkSender(validated, id){
+    if(validated != 'true'){
       return fetch('https://olitot.com/DB/INC/postgres.php', {
           method: 'POST',
           headers:
@@ -107,22 +54,53 @@ class MyOrderDetail extends React.Component {
           },
           body: JSON.stringify(
           {
-            action : 'checkRate',
-            id : this.props.navigation.state.params.id,
-            rate : this.state.rate
+            action : 'checkReservation',
+            id : id,
+            who : 'buyer'
           })
 
       }).then((response) => response.json()).then((responseJson) => {
           if(responseJson == true){
             this.componentDidMount();
-            alert("Note validée!")
+            this.setState({isModalRate: !this.state.isModalRate});
           } else {
-            alert("Une erreur s'est produite");
+            this.setState({isModalError: !this.state.isModalError});
           }
         })
         .catch((error) => {
           console.error(error);
         });
+    }
+  }
+
+  validateRate(){
+    if(this.state.rate != undefined){
+        console.log(this.props.navigation.state.params.id);
+        return fetch('https://olitot.com/DB/INC/postgres.php', {
+            method: 'POST',
+            headers:
+            {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(
+            {
+              action : 'checkRate',
+              id : this.props.navigation.state.params.id,
+              rate : this.state.rate
+            })
+
+        }).then((response) => response.json()).then((responseJson) => {
+            if(responseJson == true){
+              this.componentDidMount();
+              this.setState({isModalRateOk: !this.state.isModalRateOk});
+            } else {
+              this.setState({isModalError: !this.state.isModalError});
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
     }
   }
 
@@ -143,6 +121,16 @@ class MyOrderDetail extends React.Component {
     }
   }
 
+  _toggleModaError = () =>
+      this.setState({ isModalError : !this.state.isModalError});
+
+  _toggleModalRate = () =>
+      this.setState({ isModalRate : !this.state.isModalRate});
+
+  _toggleModalRateOk = () =>
+      this.setState({ isModalRateOk : !this.state.isModalRateOk});
+
+
   _displayAnnonce() {
     {/* ici on définit une constante nommé film qui sera égale a this.state.film donc au lieu de faire
         this.state.film.qqchose on peut juste faire film.qqchose */}
@@ -157,7 +145,40 @@ class MyOrderDetail extends React.Component {
       }
       return (
         <View style={styles.main_container}>
-          <View style={styles.image_container}>
+        <Modal  isVisible={this.state.isModalError} >
+          <View style={styles.modalContainerFirst}>
+            <View style={styles.modalMain}>
+                <Text>Une erreur s'est produite</Text>
+            </View>
+            <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModaError}>
+              <Text style={styles.btnModal}> OK </Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
+        <Modal  isVisible={this.state.isModalRate} >
+          <View style={styles.modalContainerFirst}>
+            <View style={styles.modalMain}>
+                <Text>Pensez à noter votre cuisinier après votre dégustation!</Text>
+            </View>
+            <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalRate}>
+              <Text style={styles.btnModal}> OK </Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
+        <Modal  isVisible={this.state.isModalRateOk} >
+          <View style={styles.modalContainerFirst}>
+            <View style={styles.modalMain}>
+                <Text>Merci pour votre évaluation!</Text>
+            </View>
+            <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalRateOk}>
+              <Text style={styles.btnModal}> OK </Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
+         <View style={styles.image_container}>
             <Image
               style={styles.image}
               source={{uri : food.advertpicture}}
@@ -168,7 +189,7 @@ class MyOrderDetail extends React.Component {
             />
           </View>
           <View fillViewport="true" style={styles.data_container}>
-            <ScrollView style={styles.txt_profil}>
+            <ScrollView fillViewport="true" style={styles.scroll_container}>
                 <Text style={styles.identity}>{food.firstname} {food.lastname}{"\n"}</Text>
                 <View style={styles.container_plat}>
                   <Text style={styles.identity}>{food.name}</Text>
@@ -178,7 +199,7 @@ class MyOrderDetail extends React.Component {
                 <Text style={styles.identity}>Coordonnées du vendeur</Text>
                 <Text style={styles.coordonnees}>{food.phone} </Text>
                 <Text style={styles.coordonnees}>{food.address} {food.number}, {food.city} {food.zip}</Text>
-                <CheckBox style={styles.checkbox} checked={this.check} onPress={() => this.checkSender(this.props.navigation.state.params.id)} title={"Avez vous recu votre plat?"}/>
+                <CheckBox style={styles.checkbox} checked={this.check} onPress={() => this.checkSender(food.validatedbuyer, this.props.navigation.state.params.id)} title={"Avez vous recu votre plat?"}/>
                 {rating}
             </ScrollView>
           </View>
@@ -240,6 +261,38 @@ const styles = StyleSheet.create({
     width:'100%',
     position : 'absolute',
   },
+  modalContainerFirst : {
+    backgroundColor : 'white',
+    marginTop : 250,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  modalContainerLast : {
+    backgroundColor : 'white',
+    marginTop : 10,
+    marginBottom : 250,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  modalTxtIntro : {
+    color: 'grey',
+    margin : 10,
+    fontSize : 20,
+  },
+  btnModal : {
+    textAlign : 'center',
+    color : '#6495ED',
+    fontSize : 17,
+    margin : 10,
+  },
+  modalMain : {
+    marginTop: 5,
+    paddingVertical : 15,
+    marginBottom: 5,
+    borderBottomColor: 'black',
+    borderBottomWidth: 0.5,
+    alignItems: 'center',
+  },
   profil : {
     borderWidth:1,
     borderColor:'black',
@@ -251,10 +304,10 @@ const styles = StyleSheet.create({
     borderRadius:50,
     marginTop : '51%',
   },
-  txt_profil : {
+  scroll_container : {
     //marginHorizontal : '2%',
-    flex : 1,
-    //marginBottom : '12%',
+    height : 300,
+    marginBottom : 20,
 
   },
   rate : {

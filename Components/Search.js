@@ -1,7 +1,7 @@
 // Components/Search.js
 
 import React from 'react'
-import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native'
 import FoodItem from './Item/FoodItem'
 
 class Recherche extends React.Component {
@@ -9,11 +9,22 @@ class Recherche extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-       dataSource : [], isFetching: false, searchedText : '',
+       dataSource : [], isFetching: false, searchedText : '', isLoading : false
       };
   }
 
+  _displayLoading(){
+    if(this.state.isLoading){
+      return (
+        <View style={styles.loading_container}>
+          <ActivityIndicator size='large' />
+        </View>
+      )
+    }
+  }
+
   search(){
+    this.setState({isLoading : true})
     if(this.state.searchedText.length > 0 ){
       return fetch('https://olitot.com/DB/INC/postgres.php', {
         method: 'POST',
@@ -30,12 +41,14 @@ class Recherche extends React.Component {
       }).then((response) => response.json()).then((responseJson) => {
           console.log(responseJson);
           this.setState({
-            dataSource : responseJson
+            dataSource : responseJson, isLoading : false
           });
         })
         .catch((error) => {
           console.error(error);
         });
+    } else {
+      this.componentDidMount();
     }
   }
 
@@ -50,6 +63,7 @@ class Recherche extends React.Component {
   }
 
   componentDidMount() {
+    this.setState({isLoading : true})
     return fetch('https://olitot.com/DB/INC/postgres.php', {
       method: 'POST',
       headers:
@@ -63,7 +77,8 @@ class Recherche extends React.Component {
       })
     }).then((response) => response.json()).then((responseJson) => {
         this.setState({
-          dataSource : responseJson
+          dataSource : responseJson,
+          isLoading : false
         });
       })
       .catch((error) => {
@@ -71,7 +86,10 @@ class Recherche extends React.Component {
       });
   }
 
+
+
   render() {
+
       return (
         <View style={styles.mainContainer}>
           <View style={styles.headerContainer}>
@@ -82,6 +100,7 @@ class Recherche extends React.Component {
                 <Text style = { styles.btnText }>Rechercher</Text>
             </TouchableOpacity>
           </View>
+          {this._displayLoading()}
           <FlatList
             data={this.state.dataSource}
             keyExtractor={(item) => item.id.toString()}

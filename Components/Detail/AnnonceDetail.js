@@ -9,11 +9,22 @@ class AnnonceDetail extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      annonce : undefined, buyer : [], checked : true,
+      isLoading : false, annonce : undefined, buyer : [], checked : true,
+    }
+  }
+
+  _displayLoading(){
+    if(this.state.isLoading){
+      return (
+        <View style={styles.loading_container}>
+          <ActivityIndicator size='large' />
+        </View>
+      )
     }
   }
 
   componentDidMount() {
+    this.setState({isLoading : true})
     return fetch('https://olitot.com/DB/INC/postgres.php', {
         method: 'POST',
         headers:
@@ -32,9 +43,11 @@ class AnnonceDetail extends React.Component {
         this.setState({
           annonce : responseJson[0],
           buyer : responseJson,
+          isLoading : false
         });
       })
       .catch((error) => {
+        this.setState({isLoading : false})
         console.error(error);
       });
   }
@@ -49,37 +62,40 @@ class AnnonceDetail extends React.Component {
         var bool = false;
       }
       if(act.emailbuyer != null){
-        temp.push({'id': act.reservid,'idAdvert' : act.id, 'txt' : act.emailbuyer + ", " + act.qtbought + " parts achetée(s)", 'checked' : bool});
+        temp.push({'id': act.reservid,'sender' : act.validatedsender, 'idAdvert' : act.id, 'txt' : act.emailbuyer + ", " + act.qtbought + " parts achetée(s)", 'checked' : bool});
       }
     }
     return temp;
   }
 
-  checkSender(id){
-    return fetch('https://olitot.com/DB/INC/postgres.php', {
-        method: 'POST',
-        headers:
-        {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(
-        {
-          action : 'checkReservation',
-          id : id,
-          who : 'sender'
-        })
+  checkSender(id, validated){
+    this.setState({isLoading : true})
+    if(validated != 'true'){
+      return fetch('https://olitot.com/DB/INC/postgres.php', {
+          method: 'POST',
+          headers:
+          {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(
+          {
+            action : 'checkReservation',
+            id : id,
+            who : 'sender'
+          })
 
-    }).then((response) => response.json()).then((responseJson) => {
-        if(responseJson == true){
-          this.componentDidMount();
-        } else {
-          alert("Une erreur s'est produite");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+      }).then((response) => response.json()).then((responseJson) => {
+          if(responseJson == true){
+            this.componentDidMount();
+          } else {
+            alert("Une erreur s'est produite");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   }
 
   _displayAnnonce() {
@@ -87,8 +103,7 @@ class AnnonceDetail extends React.Component {
         this.state.film.qqchose on peut juste faire film.qqchose */}
     const { annonce } = this.state;
     let arrB = this.buyerListing(this.state.buyer);
-    const arrBText = arrB.map((type)=> <CheckBox key={type['id']} style={styles.checkbox} checked={type['checked']} onPress={() => this.checkSender(type['id'])} title={type['txt']}/>)
-
+    const arrBText = arrB.map((type)=> <CheckBox key={type['id']} style={styles.checkbox} checked={type['checked']} onPress={() => this.checkSender(type['id'], type['sender'])} title={type['txt']}/>)
     //console.log(this.state.buyer);
     if (this.state.annonce != undefined) {
       return (
@@ -99,6 +114,7 @@ class AnnonceDetail extends React.Component {
               source={{uri : annonce.advertpicture}}
             />
           </View>
+          {this._displayLoading()}
           <View style={styles.data_container}>
             <Text style={styles.plat}>{annonce.name}</Text>
             <Text style={styles.prix}>{annonce.price}€/Part</Text>

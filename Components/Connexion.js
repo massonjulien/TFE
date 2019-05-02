@@ -75,12 +75,13 @@ class Connexion extends React.Component {
         })
 
     }).then((response) => response.json()).then((responseJson) => {
+        console.log(responseJson);
         if(responseJson != false ){
           this._connectionReducer(responseJson, 'address');
           this._connectionReducer(responseJson.length, 'nbAddress');
-        } else {
-
         }
+        console.log(this.props.nbAdress);
+
 
       })
       .catch((error) => {
@@ -137,7 +138,7 @@ class Connexion extends React.Component {
           }).then((response) => response.json()).then((responseJson) => {
               console.log(responseJson);
               if(responseJson){
-                this._connectionReducer(this.state.Email, "login")
+                this._connectionReducer(responseJson[0]['email'], "login");
                 this.annonce();
                 this.address();
                 this.myOrders();
@@ -160,7 +161,7 @@ class Connexion extends React.Component {
 
 
   render() {
-    if(this.state.isConnected == true){
+    if(this.props.connected == true){
       return (
           <View style={styles.LoggedContainer}>
             <AccountItem style={styles.account} />
@@ -171,7 +172,7 @@ class Connexion extends React.Component {
             </TouchableOpacity>
           </View>
       )
-    } else if(this.state.isConnected == false){
+    } else if(this.props.connected == false){
       return(
         <KeyboardAwareScrollView
           style={{ backgroundColor: '#4c69a5' }}
@@ -284,7 +285,8 @@ const styles = StyleSheet.create({
 const mapStateToPros = (state) => {
   return {
     email: state.email,
-    connected: state.connected
+    connected: state.connected,
+    nbAdress : state.nbAddress
   }
 }
 export default connect(mapStateToPros)(Connexion)

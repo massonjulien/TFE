@@ -9,7 +9,7 @@ class Address extends React.Component {
   constructor(props) {
   super(props);
   this.state = {
-      isModalAdVisible : false, country : '', city : '', postal : '', address: '', num : ''
+      isModalAdNAN : false, isModalAdOk: false, isModalAdVisible : false, isModalAdPasOk : false, country : '', city : '', postal : '', address: '', num : ''
     };
   }
 
@@ -45,59 +45,45 @@ class Address extends React.Component {
   }
 
   addAd = () => {
-    if(this.state.country != ''){
-      if(this.state.city != ''){
-        if(this.state.postal != ''){
-          if(this.state.address !=''){
-            if(this.state.num != ''){
-              this.setState({ loading: true, disabled: true }, () =>
+    if(this.state.country != '' && this.state.num != '' && this.state.city != '' && this.state.postal != '' && this.state.address !=''){
+        if(!isNaN(this.num) || !isNaN(this.state.postal)){
+          this.setState({ loading: true, disabled: true }, () =>
+          {
+              fetch('https://olitot.com/DB/INC/postgres.php',
               {
-                  fetch('https://olitot.com/DB/INC/postgres.php',
+                  method: 'POST',
+                  headers:
                   {
-                      method: 'POST',
-                      headers:
-                      {
-                          'Accept': 'application/json',
-                          'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify(
-                      {
-                        action : 'addAddress',
-                        email : this.props.email,
-                        country : this.state.country,
-                        city : this.state.city,
-                        zip : this.state.postal,
-                        address : this.state.address,
-                        num : this.state.num
-                      })
+                      'Accept': 'application/json',
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(
+                  {
+                    action : 'addAddress',
+                    email : this.props.email,
+                    country : this.state.country,
+                    city : this.state.city,
+                    zip : this.state.postal,
+                    address : this.state.address,
+                    num : this.state.num
+                  })
 
-                  }).then((response) => response.json()).then((responseJson) =>
-                  {
-                      alert("Adresse ajoutée !");
-                      this.address();
-                      this.setState({loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
-                  }).catch((error) =>
-                  {
-                      //alert(error);
-                      console.error(error);
-                      this.setState({ loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
-                  });
+              }).then((response) => response.json()).then((responseJson) =>
+              {
+                  this.address();
+                  this.setState({loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
+              }).catch((error) =>
+              {
+                  //alert(error);
+                  console.error(error);
+                  this.setState({ loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
               });
-
-            } else {
-              alert('Champ numéro vide!');
-            }
-          } else {
-            alert('Champ adresse vide!');
-          }
+          });
         } else {
-          alert('Champ postal vide!');
+          this.setState({isModalAdVisible: !this.state.isModalAdVisible, isModalAdNAN : !this.state.isModalAdNAN });
         }
       } else {
-        alert('Champ ville vide!');
-      }
-    } else {
-      alert('Champ pays vide!');
+        this.setState({isModalAdVisible: !this.state.isModalAdVisible, isModalAdPasOk : !this.state.isModalAdPasOk });
     }
   }
 
@@ -118,7 +104,7 @@ class Address extends React.Component {
     }).then((response) => response.json()).then((responseJson) => {
           this._connectionReducer(responseJson, 'address');
           this._connectionReducer(responseJson.length, 'nbAddress');
-          this.forceUpdate();
+          //this.forceUpdate();
 
       })
       .catch((error) => {
@@ -134,12 +120,40 @@ class Address extends React.Component {
     }
   }
 
+  _toggleModalAdPasOk = () =>
+      this.setState({ isModalAdVisible : !this.state.isModalAdVisible, isModalAdPasOk: !this.state.isModalAdPasOk});
+
+  _toggleModalAdNAN = () =>
+      this.setState({ isModalAdVisible : !this.state.isModalAdVisible, isModalAdNAN: !this.state.isModalAdNAN});
 
 
   render() {
     if(this.props.addressEmpty){
       return (
         <View style={styles.container}>
+
+        <Modal  isVisible={this.state.isModalAdNAN} >
+          <View style={styles.modalContainerFirst}>
+            <View style={styles.modalMain}>
+                <Text>Code postal ou numéro incorrect!</Text>
+            </View>
+            <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalAdNAN}>
+              <Text style={styles.btnModal}> OK </Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
+        <Modal  isVisible={this.state.isModalAdPasOk} >
+          <View style={styles.modalContainerFirst}>
+            <View style={styles.modalMain}>
+                <Text>Un des champs est vide</Text>
+            </View>
+            <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalAdPasOk}>
+              <Text style={styles.btnModal}> OK </Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
         <Modal  isVisible={this.state.isModalAdVisible} >
           <View style={styles.modalContainerFirst}>
             <View style={styles.modalMain}>
@@ -319,7 +333,7 @@ const styles = StyleSheet.create({
     borderTopWidth : 1,
   },
   lastContainer : {
-    flex : 1,
+    flex : 2,
   },
   Btn: {
       backgroundColor: 'rgba(0,0,0,0.6)',

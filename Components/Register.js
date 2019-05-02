@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Platform, KeyboardAvoidingView, ScrollView, Image} from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { connect } from 'react-redux'
 
 class Register extends React.Component {
 
@@ -10,6 +11,96 @@ class Register extends React.Component {
 
       this.state = {Email: '', Name: '', LastName: '', Photo:'', Tel : '', Password : '', VerifPassword : '',  loading: false, disabled: false }
   }
+
+  _connectionReducer(email = "", value){
+    const action = { type: value, value: email}
+    this.props.dispatch(action);
+    this.props.navigation.navigate("Connexion");
+  }
+
+  myOrders(){
+    return fetch('https://olitot.com/DB/INC/postgres.php', {
+        method: 'POST',
+        headers:
+        {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+        {
+          action : 'getMyOrders',
+          email : this.props.email
+        })
+
+    }).then((response) => response.json()).then((responseJson) => {
+        if(responseJson != false ){
+          this._connectionReducer(responseJson, 'myOrders');
+        } else {
+
+        }
+
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  address() {
+    return fetch('https://olitot.com/DB/INC/postgres.php', {
+        method: 'POST',
+        headers:
+        {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+        {
+          action : 'getAddress',
+          email : this.props.email
+        })
+
+    }).then((response) => response.json()).then((responseJson) => {
+        if(responseJson != false ){
+          this._connectionReducer(responseJson, 'address');
+          this._connectionReducer(responseJson.length, 'nbAddress');
+        } else {
+
+        }
+
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+  }
+
+  annonce() {
+    return fetch('https://olitot.com/DB/INC/postgres.php', {
+        method: 'POST',
+        headers:
+        {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+        {
+          action : 'getAdverts',
+          email : this.props.email
+        })
+
+    }).then((response) => response.json()).then((responseJson) => {
+        if(responseJson != false ){
+          this._connectionReducer(responseJson, 'annonce');
+        } else {
+
+        }
+
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    }
 
   createNewUser = () =>  {
 
@@ -35,8 +126,8 @@ class Register extends React.Component {
                 alert("Champ prénom vide!")
               } else if (this.state.LastName === ''){
                 alert("Champ nom vide!")
-              } else if(this.state.Tel === ''){
-                alert("Champ téléphone vide!")
+              } else if(this.state.Tel === '' || isNaN(this.state.Tel) || this.state.Tel.length < 8 || this.state.Tel.length > 10){
+                alert("Champ téléphone vide ou contient autre chose que des chiffres!")
               } else if(this.state.Password === ''){
                 alert("Champ mot de passe vide!")
               } else if(this.state.VerifPassword === ''){
@@ -81,10 +172,12 @@ class Register extends React.Component {
                 password: this.state.Password
               })
 
-          }).then((response) => response.json()).then((responseJson) =>
-          {
+          }).then((response) => response.json()).then((responseJson) =>{
+              this._connectionReducer(this.state.Email, "login");
+              this.annonce();
+              this.address();
+              this.myOrders();
               this.props.navigation.navigate("Connexion");
-              alert("Vous êtes inscrit! Vous pouvez maintenant vous connecter");
               this.setState({ loading: false, disabled: false });
           }).catch((error) =>
           {
@@ -222,5 +315,9 @@ const styles = StyleSheet.create(
 });
 
 
-
-export default Register
+const mapStateToPros = (state) => {
+  return {
+    email: state.email,
+  }
+}
+export default connect(mapStateToPros)(Register)

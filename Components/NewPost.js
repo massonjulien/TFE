@@ -17,12 +17,10 @@ class NewPost extends React.Component {
   }
 
   saveData = () => {
-
-    console.log('date : ' + this.state.date);
-    console.log('beginHour : ' + this.state.beginHour);
-    console.log('endHour : ' + this.state.endHour);
-
-    console.log(this.state.value);
+    //console.log('date : ' + this.state.date);
+    //console.log('beginHour : ' + this.state.beginHour);
+  //  console.log('endHour : ' + this.state.endHour);
+    //console.log(this.state.value);
     if(this.state.date == ''){
       alert('Veuillez selectionner une date')
     } else {
@@ -49,7 +47,7 @@ class NewPost extends React.Component {
             if(this.state.value == undefined){
               alert("Choissisez une adresse pour l'annonce!");
             } else {
-              if(this.state.nom != '' && this.state.description != '' && this.state.prix != '' && this.state.qte != ''){
+              if(this.state.nom != '' && this.state.description != '' && this.state.prix != '' && this.state.qte != '' && this.state.qte != undefined  && !isNaN(this.state.prix) && !isNaN(this.state.qte)){
                 this.setState({ loading: true, disabled: true }, () =>
                 {
                     fetch('https://olitot.com/DB/INC/postgres.php',
@@ -91,7 +89,7 @@ class NewPost extends React.Component {
                     });
                 });
               } else {
-                alert('Tous les champs doivent être remplis');
+                alert("Oubli ou erreur dans votre annonce!");
               }
             }
           }
@@ -207,25 +205,15 @@ class NewPost extends React.Component {
             onChangeText = {(text) => this.setState({ nom: text })}
           />
           <View style={styles.picker}>
-            <Text style={styles.ennoncPicker}>Nombre de part      </Text>
-            <Picker
-              selectedValue={this.state.qte}
-              style={{height: 50, width: 300}}
-              onValueChange={(itemValue, itemIndex) =>
-                this.setState({qte: itemValue})
-              }>
-              <Picker.Item label="0" value="0" />
-              <Picker.Item label="1" value="1" />
-              <Picker.Item label="2" value="2" />
-              <Picker.Item label="3" value="3" />
-              <Picker.Item label="4" value="4" />
-              <Picker.Item label="5" value="5" />
-              <Picker.Item label="6" value="6" />
-              <Picker.Item label="7" value="7" />
-              <Picker.Item label="8" value="8" />
-              <Picker.Item label="9" value="9" />
-              <Picker.Item label="10" value="10" />
-            </Picker>
+            <Text style={styles.ennoncPicker}>Nombre de part </Text>
+            <TextInput
+              maxLength = {2}
+              blurOnSubmit = {true}
+              keyboardType = 'numeric'
+              placeholder = "0"
+              style = { styles.prix }
+              onChangeText = {(text) => this.setState({ qte: text })}
+            />
           </View>
           <TextInput
             multiline = {true}
@@ -361,7 +349,7 @@ const styles = StyleSheet.create({
   },
   firstContainer : {
     marginTop : 30,
-    height : '5%',
+    height : '10%',
   },
   main : {
     height : '80%',

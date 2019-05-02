@@ -3,156 +3,19 @@ import { connect } from 'react-redux'
 import React from 'react'
 import { StyleSheet, ActivityIndicator, ScrollView, Button, ListView, Text, View, Alert, FlatList, Image, TouchableOpacity, TextInput } from 'react-native'
 import Modal from "react-native-modal"
-
+import { Rating, AirbnbRating } from 'react-native-ratings';
 
 class AccountItem extends React.Component {
 
   constructor(props) {
-  super(props);
-  this.state = {
-    loading: false, dataSource: [], isModalTelVisible: false, isModalPwdVisible:false, isModalPhotoVisible : false, isModalTelChangedVisible : false,
-    Tel : '', Password : '', newTel : '',  oldPwd : '', verifPwd : '', newPwd : '', Photo : 'x',
-  };
-}
-
-rate(nb){
-  if(nb >= 0 && nb < 1){
-     return require('../../Image/noStar.jpg')
-  } else if(nb >= 1 && nb < 2){
-     return require('../../Image/oneStar.jpg')
-  } else if(nb >= 2 && nb < 3){
-     return require('../../Image/twoStar.jpg')
-  } else if(nb >= 3 && nb < 4){
-     return require('../../Image/threeStar.jpg')
-  } else if(nb >= 4 && nb < 5){
-     return require('../../Image/fourStar.jpg')
-  } else if(nb == 5){
-     return require('../../Image/fiveStar.jpg')
-  } else if (nb == -1 ) {
-
+    super(props);
+    this.state = {
+      isLoading: false, dataSource: [],isModalTelNotOk : false, isModalNotOkPwd : false, isModalPwdToShort : false, isModalPwdWrong : false, isModalPwdNotSame : false, isModalTelVisible: false, isModalPwdVisible:false, isModalOkPwd : false, isModalPhotoVisible : false, isModalTelChangedVisible : false,
+      Tel : '', Password : '', newTel : '',  oldPwd : '', verifPwd : '', newPwd : '', Photo : 'x',
+    };
   }
-}
 
-countPassword(pass = ""){
-  let x = "";
-  for(let i = 0; i < pass.length; i++){
-    x += "*"
-  }
-  return x
-}
-
-_changeTel = () => {
-  if(this.state.newTel.length < 10){
-    alert("Numéro trop court!");
-  } else if(this.state.newTel.length > 10){
-    alert("Numéro trop long!");
-  } else {
-
-    this.setState({ loading: true, disabled: true }, () =>
-    {
-        fetch('https://olitot.com/DB/INC/postgres.php',
-        {
-            method: 'POST',
-            headers:
-            {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(
-            {
-              action : 'changePhone',
-              email : this.state.dataSource['email'],
-              phone : this.state.newTel
-            })
-
-        }).then((response) => response.json()).then((responseJson) =>
-        {
-
-            this.setState({ loading : false, isModalTelVisible: !this.state.isModalTelVisible, isModalTelChangedVisible : !this.state.isModalTelChangedVisible, Tel : this.state.newTel, newTel : '' });
-        }).catch((error) =>
-        {
-            //alert(error);
-            console.error(error);
-            this.setState({ loading: false, disabled: false });
-        });
-    });
-  }
-}
-
-_changePwd = () => {
-  this.setState({loading: true}, () => {
-        fetch('https://olitot.com/DB/INC/postgres.php', {
-            method: 'POST',
-            headers:
-            {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(
-            {
-              action : 'testUser',
-              email : this.state.dataSource['email'],
-              password : this.state.oldPwd,
-            })
-        }).then((response) => response.json()).then((responseJson) => {
-            if(responseJson){
-              if(this.state.newPwd == this.state.verifPwd){
-                if(this.state.newPwd.length > 8){
-                  fetch('https://olitot.com/DB/INC/postgres.php',
-                  {
-                      method: 'POST',
-                      headers:
-                      {
-                          'Accept': 'application/json',
-                          'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify(
-                      {
-                        action : 'changePassword',
-                        email : this.state.dataSource['email'],
-                        password : this.state.newPwd,
-                      })
-
-                  }).then((response) => response.json()).then((responseJson) =>
-                  {
-                      alert("Mot de passe changé!");
-                      this.setState({ loading : false, isModalPwdVisible: !this.state.isModalPwdVisible, Password : this.state.newPwd, oldPwd : '', verifPwd : '', newPwd : '' });
-                  }).catch((error) =>
-                  {
-                      //alert(error);
-                      console.error(error);
-                      this.setState({ loading: false, disabled: false });
-                  });
-                } else {
-                  alert("Mot de passe trop court (8caractères minimum)");
-                }
-              } else {
-                alert('Nouveaux mot de passe pas identique!')
-              }
-            } else {
-              alert('mdp mauvais');
-              this.setState({ loading: false, disabled: false });
-            }
-        }).catch((error) => {
-            //alert(error);
-            console.error(error);
-        });
-  });
-}
-
-_toggleModalTel = () =>
-    this.setState({ isModalTelVisible: !this.state.isModalTelVisible, newTel : '' });
-
-_toggleModalTelChanged = () =>
-    this.setState({ isModalTelChangedVisible: !this.state.isModalTelChangedVisible });
-
-_toggleModalPwd = () =>
-    this.setState({ isModalPwdVisible: !this.state.isModalPwdVisible, oldPwd : '', newPwd : '', verifPwd : '' });
-
-_toggleModalPhoto = () =>
-    this.setState({ isModalPhotoVisible: !this.state.isModalPhotoVisible });
-
-_displayLoading(){
+  _displayLoading(){
     if(this.state.isLoading){
       return (
         <View style={styles.loading_container}>
@@ -160,9 +23,162 @@ _displayLoading(){
         </View>
       )
     }
-}
+  }
+
+  rate(nb){
+    if(nb >= 0 && nb < 1){
+       return require('../../Image/noStar.jpg')
+    } else if(nb >= 1 && nb < 2){
+       return require('../../Image/oneStar.jpg')
+    } else if(nb >= 2 && nb < 3){
+       return require('../../Image/twoStar.jpg')
+    } else if(nb >= 3 && nb < 4){
+       return require('../../Image/threeStar.jpg')
+    } else if(nb >= 4 && nb < 5){
+       return require('../../Image/fourStar.jpg')
+    } else if(nb == 5){
+       return require('../../Image/fiveStar.jpg')
+    } else if (nb == -1 ) {
+
+    }
+  }
+
+  countPassword(pass = ""){
+    let x = "";
+    for(let i = 0; i < pass.length; i++){
+      x += "*"
+    }
+    return x
+  }
+
+  _changeTel = () => {
+    if(this.state.newTel.length < 9 || this.state.newTel.length > 10 || isNaN(this.state.newTel)){
+      this.setState({isModalTelVisible : !this.state.isModalTelVisible, isModalTelNotOk : !this.state.isModalTelNotOk});
+    } else {
+      this.setState({ loading: true, disabled: true }, () =>
+      {
+          fetch('https://olitot.com/DB/INC/postgres.php',
+          {
+              method: 'POST',
+              headers:
+              {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(
+              {
+                action : 'changePhone',
+                email : this.state.dataSource['email'],
+                phone : this.state.newTel
+              })
+
+          }).then((response) => response.json()).then((responseJson) =>
+          {
+              this.setState({ isLoading : false, isModalTelVisible: !this.state.isModalTelVisible, isModalTelChangedVisible : !this.state.isModalTelChangedVisible, Tel : this.state.newTel, newTel : '' });
+          }).catch((error) =>
+          {
+              //alert(error);
+              console.error(error);
+              this.setState({ isLoading : false, isModalPwdVisible : !this.state.isModalPwdVisible, isModalNotOkPwd : !this.state.isModalNotOkPwd, loading: false, disabled: false });
+          });
+      });
+    }
+  }
+
+  _changePwd = () => {
+    this.setState({isLoading: true}, () => {
+          fetch('https://olitot.com/DB/INC/postgres.php', {
+              method: 'POST',
+              headers:
+              {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(
+              {
+                action : 'testUser',
+                email : this.state.dataSource['email'],
+                password : this.state.oldPwd,
+              })
+          }).then((response) => response.json()).then((responseJson) => {
+              if(responseJson){
+                if(this.state.newPwd == this.state.verifPwd){
+                  if(this.state.newPwd.length > 8){
+                    fetch('https://olitot.com/DB/INC/postgres.php',
+                    {
+                        method: 'POST',
+                        headers:
+                        {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(
+                        {
+                          action : 'changePassword',
+                          email : this.state.dataSource['email'],
+                          password : this.state.newPwd,
+                        })
+
+                    }).then((response) => response.json()).then((responseJson) =>
+                    {
+                        //alert("Mot de passe changé!");
+                        this.setState({ isLoading : false, isModalOkPwd : !this.state.isModalOkPwd, isModalPwdVisible: !this.state.isModalPwdVisible, Password : this.state.newPwd, oldPwd : '', verifPwd : '', newPwd : '' });
+                    }).catch((error) =>
+                    {
+                        //alert(error);
+                        //console.error(error);
+                        this.setState({ isLoading : false, isModalPwdVisible : !this.state.isModalPwdVisible, isModalNotOkPwd : !this.state.isModalNotOkPwd, loading: false, disabled: false });
+                    });
+                  } else {
+                      this.setState({isLoading : false, isModalPwdToShort : !this.state.isModalPwdToShort,  isModalPwdVisible : !this.state.isModalPwdVisible});
+                  }
+                } else {
+                  this.setState({isLoading : false, isModalPwdNotSame : !this.state.isModalPwdNotSame,  isModalPwdVisible : !this.state.isModalPwdVisible});
+                }
+              } else {
+                this.setState({isLoading : false,  isModalPwdWrong : !this.state.isModalPwdWrong,  isModalPwdVisible : !this.state.isModalPwdVisible});
+              }
+          }).catch((error) => {
+              //alert(error);
+              this.setState({isLoading : false})
+              console.error(error);
+          });
+    });
+  }
+
+  _toggleModalTelNotOk = () =>
+      this.setState({ isModalTelVisible : !this.state.isModalTelVisible, isModalTelNotOk: !this.state.isModalTelNotOk});
+
+  _toggleModalPwdNotSame = () =>
+      this.setState({ isModalPwdVisible : !this.state.isModalPwdVisible, isModalPwdNotSame: !this.state.isModalPwdNotSame});
+
+  _toggleModalPwdToShort = () =>
+          this.setState({ isModalPwdVisible : !this.state.isModalPwdVisible, isModalPwdToShort: !this.state.isModalPwdToShort});
+
+  _toggleModalPwdWrong = () =>
+      this.setState({ isModalPwdVisible : !this.state.isModalPwdVisible, isModalPwdWrong: !this.state.isModalPwdWrong});
+
+  _toggleModalNotOkPwd = () =>
+      this.setState({ isModalNotOkPwd: !this.state.isModalNotOkPwd});
+
+  _toggleModalOkPwd = () =>
+      this.setState({ isModalOkPwd: !this.state.isModalOkPwd});
+
+  _toggleModalTel = () =>
+      this.setState({ isModalTelVisible: !this.state.isModalTelVisible, newTel : '' });
+
+  _toggleModalTelChanged = () =>
+      this.setState({ isModalTelChangedVisible: !this.state.isModalTelChangedVisible });
+
+  _toggleModalPwd = () =>
+      this.setState({ isModalPwdVisible: !this.state.isModalPwdVisible, oldPwd : '', newPwd : '', verifPwd : '' });
+
+  _toggleModalPhoto = () =>
+      this.setState({ isModalPhotoVisible: !this.state.isModalPhotoVisible });
+
 
 componentDidMount() {
+  this.setState({isLoading : true});
   return fetch('https://olitot.com/DB/INC/postgres.php', {
       method: 'POST',
       headers:
@@ -181,18 +197,94 @@ componentDidMount() {
         dataSource : responseJson[0],
         Tel : responseJson[0].phone,
         Password : responseJson[0].password,
-        Photo : responseJson[0].profilepicture
+        Photo : responseJson[0].profilepicture,
+        isLoading : false
       });
     })
     .catch((error) => {
       console.error(error);
+      this.setState({isLoading : false})
     });
 }
 
+whichRate(rate){
+  if(rate != -1){
+      return <AirbnbRating isDisabled={true} count={5}  defaultRating={rate} showRating={false} size={15}/>
+  } else {
+      return <Text></Text>
+  }
+}
 
 render() {
+  var rate = this.whichRate(this.state.dataSource['rate']);
   return (
     <View style={styles.mainContainer}>
+      {this._displayLoading()}
+      <Modal  isVisible={this.state.isModalTelNotOk} >
+        <View style={styles.modalContainerFirst}>
+          <View style={styles.modalMain}>
+              <Text>Le numéro entré est incorrect!</Text>
+          </View>
+          <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalTelNotOk}>
+            <Text style={styles.btnModal}> OK </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Modal  isVisible={this.state.isModalOkPwd} >
+        <View style={styles.modalContainerFirst}>
+          <View style={styles.modalMain}>
+              <Text>Votre mot de passe a changé!</Text>
+          </View>
+          <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalOkPwd}>
+            <Text style={styles.btnModal}> OK </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Modal  isVisible={this.state.isModalPwdToShort} >
+        <View style={styles.modalContainerFirst}>
+          <View style={styles.modalMain}>
+              <Text>Le nouveau mot de passe indiqué est trop court!</Text>
+          </View>
+          <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalPwdToShort}>
+            <Text style={styles.btnModal}> OK </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Modal  isVisible={this.state.isModalPwdWrong} >
+        <View style={styles.modalContainerFirst}>
+          <View style={styles.modalMain}>
+              <Text>Le mot de passe entré est incorrect</Text>
+          </View>
+          <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalPwdWrong}>
+            <Text style={styles.btnModal}> OK </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Modal  isVisible={this.state.isModalPwdNotSame} >
+        <View style={styles.modalContainerFirst}>
+          <View style={styles.modalMain}>
+              <Text>Nouveaux mots de passe non identiques</Text>
+          </View>
+          <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalPwdNotSame}>
+            <Text style={styles.btnModal}> OK </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Modal  isVisible={this.state.isModalNotOkPwd} >
+        <View style={styles.modalContainerFirst}>
+          <View style={styles.modalMain}>
+              <Text>Une erreur s'est produite</Text>
+          </View>
+          <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalNotOkPwd}>
+            <Text style={styles.btnModal}> OK </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
 
       <Modal  isVisible={this.state.isModalTelVisible} >
         <View style={styles.modalContainerFirst}>
@@ -295,10 +387,7 @@ render() {
           />
         </TouchableOpacity>
         <View style={styles.rate}>
-          <Image
-            style={styles.imgRate}
-            source={this.rate(this.state.dataSource['rate'])}
-          />
+          {rate}
         </View>
       </View>
 
