@@ -17,7 +17,7 @@ class MyOrders extends React.Component {
   _displayDetailOrder = (idadvert, id) => {
       //console.log(id);
       //console.log(idadvert);
-      this.props.navigation.navigate("MyOrderDetail", { idadvert: idadvert, id : id});
+      this.props.navigation.navigate("MyOrderDetailNew", { idadvert: idadvert, id : id});
   }
 
   onRefresh() {

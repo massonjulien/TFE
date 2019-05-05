@@ -134,22 +134,23 @@ class FoodDetail extends React.Component {
         <View style={styles.main_container}>
           <View style={styles.image_container}>
             <Image
-              style={styles.image}
-              source={{uri : food.advertpicture}}
-            />
-            <Image
               style={styles.profil}
               source={{uri : food.profilepicture}}
             />
+            <View style={styles.rate_container}>
+              <Image
+                style={styles.rate}
+                source={this.rate(food.rate)}
+              />
+            </View>
+            <Image
+              style={styles.image}
+              source={{uri : food.advertpicture}}
+            />
+
           </View>
           <View style={styles.data_container}>
-            <ScrollView fillViewport="true" style={styles.scroll_container}>
-              <View style={styles.rate_container}>
-                <Image
-                  style={styles.rate}
-                  source={this.rate(food.rate)}
-                />
-              </View>
+            <View fillViewport="true" style={styles.scroll_container}>
               <View style={styles.txt_profil}>
                 <Text style={styles.identity}>{food.name}</Text>
                 <Text style={styles.description}>{food.description}</Text>
@@ -166,7 +167,7 @@ class FoodDetail extends React.Component {
                   {qteDispItems}
                 </Picker>
               </View>
-            </ScrollView>
+            </View>
             <View style={styles.last_container}>
             <TouchableOpacity
               activeOpacity = { 0.8 } style = { styles.btn }
@@ -214,18 +215,16 @@ const styles = StyleSheet.create({
   image : {
     height: '100%',
     width:'100%',
-    position : 'absolute',
   },
   profil : {
     borderWidth:1,
     borderColor:'black',
     alignItems:'center',
     justifyContent:'center',
-    width:100,
-    height:100,
+    width:"25%",
+    height:"40%",
     backgroundColor:'#fff',
     borderRadius:50,
-    marginTop : '47%',
   },
   txt_profil : {
     marginHorizontal : '2%',

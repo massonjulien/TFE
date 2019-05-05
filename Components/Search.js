@@ -54,7 +54,7 @@ class Recherche extends React.Component {
 
   _displayDetailFood = (id) => {
       //console.log(idA)
-      this.props.navigation.navigate("FoodDetail", { id: id })
+      this.props.navigation.navigate("FoodDetailNew", { id: id })
   }
 
   onRefresh() {

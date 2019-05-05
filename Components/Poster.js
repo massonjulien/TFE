@@ -17,8 +17,8 @@ class Poster extends React.Component {
   }
 
   navigateToNewPost(){
-    console.log('coucou');
-    console.log(this.props.nbAddress);
+    //console.log('coucou');
+    //console.log(this.props.nbAddress);
     if(this.props.nbAddress == undefined || this.props.nbAddress == 0){
       alert("Vous devez d'abord réferencer une adresse pour pouvoir poster une annonce");
     } else {
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
   container : {
       flex : 1,
-      marginHorizontal : 15,
+
       marginBottom : '5%',
   },
   firstContainer : {

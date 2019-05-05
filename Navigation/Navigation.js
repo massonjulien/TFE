@@ -13,7 +13,9 @@ import NewPost from '../Components/NewPost'
 import Address from '../Components/Address'
 import AnnonceDetail from '../Components/Detail/AnnonceDetail'
 import FoodDetail from '../Components/Detail/FoodDetail'
+import FoodDetailNew from '../Components/Detail/FoodDetailNew'
 import MyOrderDetail from '../Components/Detail/MyOrderDetail'
+import MyOrderDetailNew from '../Components/Detail/MyOrderDetailNew'
 
 const PostNavigator = createStackNavigator({
   Poster: {
@@ -67,8 +69,8 @@ const SearchNavigator = createStackNavigator({
       header: null
     }
   },
-  FoodDetail: {
-    screen: FoodDetail,
+  FoodDetailNew: {
+    screen: FoodDetailNew,
   }
 });
 
@@ -80,8 +82,8 @@ const MyOrdersNavigator = createStackNavigator({
       header: null
     }
   },
-  MyOrderDetail: {
-    screen: MyOrderDetail,
+  MyOrderDetailNew: {
+    screen: MyOrderDetailNew,
   }
 });
 

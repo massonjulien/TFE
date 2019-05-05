@@ -9,7 +9,8 @@ class Address extends React.Component {
   constructor(props) {
   super(props);
   this.state = {
-      isModalAdNAN : false, isModalAdOk: false, isModalAdVisible : false, isModalAdPasOk : false, country : '', city : '', postal : '', address: '', num : ''
+      isModalAdVisible : false, isModalAdChanged : false, adMsg : "", isModalAdContent : "",
+      country : '', city : '', postal : '', address: '', num : ''
     };
   }
 
@@ -71,19 +72,19 @@ class Address extends React.Component {
               }).then((response) => response.json()).then((responseJson) =>
               {
                   this.address();
-                  this.setState({loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
+                  this.setState({ adMsg : "", loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
               }).catch((error) =>
               {
                   //alert(error);
                   console.error(error);
-                  this.setState({ loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
+                  this.setState({ adMsg : "error", loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
               });
           });
         } else {
-          this.setState({isModalAdVisible: !this.state.isModalAdVisible, isModalAdNAN : !this.state.isModalAdNAN });
+          this.setState({adMsg : "NaN", isModalAdVisible: !this.state.isModalAdVisible});
         }
       } else {
-        this.setState({isModalAdVisible: !this.state.isModalAdVisible, isModalAdPasOk : !this.state.isModalAdPasOk });
+        this.setState({adMsg : "empty", isModalAdVisible: !this.state.isModalAdVisible});
     }
   }
 
@@ -120,11 +121,36 @@ class Address extends React.Component {
     }
   }
 
-  _toggleModalAdPasOk = () =>
-      this.setState({ isModalAdVisible : !this.state.isModalAdVisible, isModalAdPasOk: !this.state.isModalAdPasOk});
+  _toggleModalChanged = () =>
+      this.setState({isModalAdChanged: !this.state.isModalAdChanged});
 
-  _toggleModalAdNAN = () =>
-      this.setState({ isModalAdVisible : !this.state.isModalAdVisible, isModalAdNAN: !this.state.isModalAdNAN});
+
+  displayAnswerAd(text){
+    if(text == "fromForm"){
+      switch(this.state.adMsg){
+        case "" :
+          break;
+        case "empty" :
+          this.setState({isModalAdContent : "Un ou plusieurs champs sont vide!", isModalAdChanged: !this.state.isModalAdChanged});
+          break;
+        case "error" :
+          this.setState({isModalAdContent : "Une erreur s'est produite", isModalAdChanged: !this.state.isModalAdChanged});
+          break
+        case "NaN" :
+          this.setState({isModalAdContent : "Le code postal et le numéro doivent être uniquement composé de chiffre", isModalAdChanged: !this.state.isModalAdChanged});
+          break;
+      }
+    } else if(text == "fromMessage") {
+      switch(this.state.adMsg){
+        case "" :
+          this.setState({adMsg : "" , isModalAdContent : "", isModalAdVisible: !this.state.isModalAdVisible});
+          break;
+        default :
+          this.setState({adMsg : "" ,isModalAdContent : "", isModalAdVisible: !this.state.isModalAdVisible});
+          break;
+      }
+    }
+  }
 
 
   render() {
@@ -132,29 +158,21 @@ class Address extends React.Component {
       return (
         <View style={styles.container}>
 
-        <Modal  isVisible={this.state.isModalAdNAN} >
+        <Modal onModalHide={() => this.displayAnswerAd("fromMessage")} isVisible={this.state.isModalAdChanged}>
           <View style={styles.modalContainerFirst}>
-            <View style={styles.modalMain}>
-                <Text>Code postal ou numéro incorrect!</Text>
+            <View style={styles.modalMainR}>
+                <Text style={styles.TxtModal}>{this.state.isModalAdContent}</Text>
             </View>
-            <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalAdNAN}>
+          </View>
+          <View style={styles.modalContainerLast}>
+            <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalChanged}>
               <Text style={styles.btnModal}> OK </Text>
             </TouchableOpacity>
           </View>
         </Modal>
 
-        <Modal  isVisible={this.state.isModalAdPasOk} >
-          <View style={styles.modalContainerFirst}>
-            <View style={styles.modalMain}>
-                <Text>Un des champs est vide</Text>
-            </View>
-            <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalAdPasOk}>
-              <Text style={styles.btnModal}> OK </Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
 
-        <Modal  isVisible={this.state.isModalAdVisible} >
+        <Modal onModalHide={() => this.displayAnswerAd("fromForm")}  isVisible={this.state.isModalAdVisible} >
           <View style={styles.modalContainerFirst}>
             <View style={styles.modalMain}>
                 <Text style={styles.modalTxtIntro}>Ajouter une adresse</Text>
@@ -224,8 +242,20 @@ class Address extends React.Component {
     } else {
       return (
         <View style={styles.container}>
+            <Modal onModalHide={() => this.displayAnswerAd("fromMessage")} isVisible={this.state.isModalAdChanged}>
+              <View style={styles.modalContainerFirst}>
+                <View style={styles.modalMainR}>
+                    <Text style={styles.TxtModal}>{this.state.isModalAdContent}</Text>
+                </View>
+              </View>
+              <View style={styles.modalContainerLast}>
+                <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalChanged}>
+                  <Text style={styles.btnModal}> OK </Text>
+                </TouchableOpacity>
+              </View>
+            </Modal>
 
-            <Modal  isVisible={this.state.isModalAdVisible} >
+            <Modal onModalHide={() => this.displayAnswerAd("fromForm")} isVisible={this.state.isModalAdVisible} >
               <View style={styles.modalContainerFirst}>
                 <View style={styles.modalMain}>
                     <Text style={styles.modalTxtIntro}>Ajouter une adresse</Text>
@@ -359,6 +389,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     alignItems: 'center',
   },
+  modalMainR : {
+    marginTop: 5,
+    paddingVertical : 15,
+    marginBottom: 5,
+    alignItems: 'center',
+  },
   modalContainerFirst : {
     backgroundColor : 'white',
     marginTop : 250,
@@ -376,6 +412,12 @@ const styles = StyleSheet.create({
     textAlign : 'center',
     color : '#6495ED',
     fontSize : 17,
+    margin : 10,
+  },
+  TxtModal : {
+    textAlign : 'center',
+    color : 'black',
+    fontSize : 15,
     margin : 10,
   },
 })
