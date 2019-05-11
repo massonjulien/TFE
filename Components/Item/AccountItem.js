@@ -197,7 +197,7 @@ componentDidMount() {
 
 whichRate(rate){
   if(rate != -1){
-      return <AirbnbRating isDisabled={true} count={5}  defaultRating={rate} showRating={false} size={15}/>
+      return <AirbnbRating isDisabled={true} count={5}  defaultRating={rate} showRating={false} size={25}/>
   } else {
       return <Text></Text>
   }
@@ -494,6 +494,7 @@ const styles = StyleSheet.create({
     height:100,
     backgroundColor:'#fff',
     borderRadius:50,
+    marginBottom : '2%',
   },
   rate : {
     flex : 1,

@@ -12,6 +12,7 @@ import MyOrders from '../Components/MyOrders'
 import NewPost from '../Components/NewPost'
 import Address from '../Components/Address'
 import AnnonceDetail from '../Components/Detail/AnnonceDetail'
+import AnnonceDetailNew from '../Components/Detail/AnnonceDetailNew'
 import FoodDetail from '../Components/Detail/FoodDetail'
 import FoodDetailNew from '../Components/Detail/FoodDetailNew'
 import MyOrderDetail from '../Components/Detail/MyOrderDetail'
@@ -32,15 +33,8 @@ const PostNavigator = createStackNavigator({
       header: null
     }
   },
-  Address: {
-    screen: Address,
-    navigationOptions: {
-      headerLeft: null,
-      header: null,
-    }
-  },
-  AnnonceDetail : {
-    screen : AnnonceDetail
+  AnnonceDetailNew : {
+    screen : AnnonceDetailNew
   }
 });
 
@@ -145,6 +139,25 @@ const OlitotTabNavigator = createBottomTabNavigator({
       }
     }
   },
+  Address: {
+    screen: Address,
+    navigationOptions: {
+      tabBarIcon: ({ focused }) => {
+        const icon = focused
+          ? styles.activeIcon
+          : styles.inactiveIcon
+        const image = focused
+          ? require('../Image/homeSelected.png')
+          : require('../Image/homeUnselected.png')
+          return (
+              <Image
+                  source={image}
+                  style={icon}
+              />
+          )
+      }
+    }
+  },
   Profil: {
     screen: ConnectionNagivator,
     navigationOptions: {
@@ -169,7 +182,8 @@ const OlitotTabNavigator = createBottomTabNavigator({
     //activeBackgroundColor: '#DDDDDD',
     //inactiveBackgroundColor: '#FFFFFF',
     showLabel: false,
-    showIcon: true
+    showIcon: true,
+    style : {height :'6%',}
   }
 })
 

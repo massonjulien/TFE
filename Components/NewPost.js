@@ -343,6 +343,7 @@ const styles = StyleSheet.create({
   container : {
       flex : 1,
       marginHorizontal : 15,
+      marginBottom : '2%',
   },
   containerImg : {
         alignItems: 'center',

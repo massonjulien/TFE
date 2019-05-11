@@ -77,7 +77,7 @@ class FoodItem extends React.Component {
 
 const styles = StyleSheet.create({
   main_container: {
-    height: 150,
+    height: 130,
     flexDirection: 'row'
   },
   horaireContainer : {

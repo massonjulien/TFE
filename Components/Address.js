@@ -71,9 +71,14 @@ class Address extends React.Component {
 
               }).then((response) => response.json()).then((responseJson) =>
               {
-                  this.address();
-                  this.setState({ adMsg : "", loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
-              }).catch((error) =>
+                    if(responseJson){
+                      this.address();
+                      this.setState({ adMsg : "", loading : false, isModalAdVisible: !this.state.isModalAdVisible, country : '', city : '', address : '', num : '', postal : '' });
+
+                    } else {
+                      this.setState({ adMsg : "fakeAddress", loading : false, isModalAdVisible: !this.state.isModalAdVisible,})
+                    }
+                  }).catch((error) =>
               {
                   //alert(error);
                   console.error(error);
@@ -128,6 +133,9 @@ class Address extends React.Component {
   displayAnswerAd(text){
     if(text == "fromForm"){
       switch(this.state.adMsg){
+        case 'fakeAddress' :
+          this.setState({isModalAdContent : "L'adresse referencée est incorrect", isModalAdChanged: !this.state.isModalAdChanged});
+          break;
         case "" :
           break;
         case "empty" :
@@ -154,177 +162,169 @@ class Address extends React.Component {
 
 
   render() {
-    if(this.props.addressEmpty){
-      return (
-        <View style={styles.container}>
+    if(this.props.connected){
+      if(this.props.addressEmpty){
+        return (
+          <View style={styles.container}>
 
-        <Modal onModalHide={() => this.displayAnswerAd("fromMessage")} isVisible={this.state.isModalAdChanged}>
-          <View style={styles.modalContainerFirst}>
-            <View style={styles.modalMainR}>
-                <Text style={styles.TxtModal}>{this.state.isModalAdContent}</Text>
+          <Modal onModalHide={() => this.displayAnswerAd("fromMessage")} isVisible={this.state.isModalAdChanged}>
+            <View style={styles.modalContainerFirst}>
+              <View style={styles.modalMainR}>
+                  <Text style={styles.TxtModal}>{this.state.isModalAdContent}</Text>
+              </View>
+            </View>
+            <View style={styles.modalContainerLast}>
+              <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalChanged}>
+                <Text style={styles.btnModal}> OK </Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+
+
+          <Modal onModalHide={() => this.displayAnswerAd("fromForm")}  isVisible={this.state.isModalAdVisible} >
+            <View style={styles.modalContainerFirst}>
+              <View style={styles.modalMain}>
+                  <Text style={styles.modalTxtIntro}>Ajouter une adresse</Text>
+                  <TextInput
+                    underlineColorAndroid = "transparent"
+                    placeholder = "Pays"
+                    style = { styles.textInput }
+                    onChangeText = {(text) => this.setState({ country: text })}
+                  />
+                  <TextInput
+                    underlineColorAndroid = "transparent"
+                    placeholder = "Ville"
+                    style = { styles.textInput }
+                    onChangeText = {(text) => this.setState({ city: text })}
+                  />
+                  <TextInput
+                    underlineColorAndroid = "transparent"
+                    placeholder = "Code Postal"
+                    style = { styles.textInput }
+                    onChangeText = {(text) => this.setState({ postal: text })}
+                  />
+                  <TextInput
+                    underlineColorAndroid = "transparent"
+                    placeholder = "Adresse"
+                    style = { styles.textInput }
+                    onChangeText = {(text) => this.setState({ address: text })}
+                  />
+                  <TextInput
+                    underlineColorAndroid = "transparent"
+                    placeholder = "Numéro"
+                    style = { styles.textInput }
+                    onChangeText = {(text) => this.setState({ num: text })}
+                  />
+              </View>
+              <TouchableOpacity style={styles.sendTouch} onPress={this.addAd}>
+                <Text style={styles.btnModal}> Ajouter </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.modalContainerLast}>
+              <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalAd}>
+                <Text style={styles.btnModal}> Annuler </Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+
+
+            <View style={styles.firstContainer}>
+              <Text style={styles.Title}>Mes adresses</Text>
+              <TouchableOpacity
+                activeOpacity = { 0.8 } style = { styles.Btn }
+                onPress={this._toggleModalAd}>
+                  <Text style = { styles.btnText }>Nouvelle adresse</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.flatList}>
+              <Text>Pas d'adresse enregistré</Text>
             </View>
           </View>
-          <View style={styles.modalContainerLast}>
-            <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalChanged}>
-              <Text style={styles.btnModal}> OK </Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
+        )
+      } else {
+        return (
+          <View style={styles.container}>
+              <Modal onModalHide={() => this.displayAnswerAd("fromMessage")} isVisible={this.state.isModalAdChanged}>
+                <View style={styles.modalContainerFirst}>
+                  <View style={styles.modalMainR}>
+                      <Text style={styles.TxtModal}>{this.state.isModalAdContent}</Text>
+                  </View>
+                </View>
+                <View style={styles.modalContainerLast}>
+                  <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalChanged}>
+                    <Text style={styles.btnModal}> OK </Text>
+                  </TouchableOpacity>
+                </View>
+              </Modal>
+
+              <Modal onModalHide={() => this.displayAnswerAd("fromForm")} isVisible={this.state.isModalAdVisible} >
+                <View style={styles.modalContainerFirst}>
+                  <View style={styles.modalMain}>
+                      <Text style={styles.modalTxtIntro}>Ajouter une adresse</Text>
+                      <TextInput
+                        underlineColorAndroid = "transparent"
+                        placeholder = "Pays"
+                        style = { styles.textInput }
+                        onChangeText = {(text) => this.setState({ country: text })}
+                      />
+                      <TextInput
+                        underlineColorAndroid = "transparent"
+                        placeholder = "Ville"
+                        style = { styles.textInput }
+                        onChangeText = {(text) => this.setState({ city: text })}
+                      />
+                      <TextInput
+                        underlineColorAndroid = "transparent"
+                        placeholder = "Code Postal"
+                        style = { styles.textInput }
+                        onChangeText = {(text) => this.setState({ postal: text })}
+                      />
+                      <TextInput
+                        underlineColorAndroid = "transparent"
+                        placeholder = "Adresse"
+                        style = { styles.textInput }
+                        onChangeText = {(text) => this.setState({ address: text })}
+                      />
+                      <TextInput
+                        underlineColorAndroid = "transparent"
+                        placeholder = "Numéro"
+                        style = { styles.textInput }
+                        onChangeText = {(text) => this.setState({ num: text })}
+                      />
+                  </View>
+                  <TouchableOpacity style={styles.sendTouch} onPress={this.addAd}>
+                    <Text style={styles.btnModal}> Ajouter </Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.modalContainerLast}>
+                  <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalAd}>
+                    <Text style={styles.btnModal}> Annuler </Text>
+                  </TouchableOpacity>
+                </View>
+              </Modal>
 
 
-        <Modal onModalHide={() => this.displayAnswerAd("fromForm")}  isVisible={this.state.isModalAdVisible} >
-          <View style={styles.modalContainerFirst}>
-            <View style={styles.modalMain}>
-                <Text style={styles.modalTxtIntro}>Ajouter une adresse</Text>
-                <TextInput
-                  underlineColorAndroid = "transparent"
-                  placeholder = "Pays"
-                  style = { styles.textInput }
-                  onChangeText = {(text) => this.setState({ country: text })}
-                />
-                <TextInput
-                  underlineColorAndroid = "transparent"
-                  placeholder = "Ville"
-                  style = { styles.textInput }
-                  onChangeText = {(text) => this.setState({ city: text })}
-                />
-                <TextInput
-                  underlineColorAndroid = "transparent"
-                  placeholder = "Code Postal"
-                  style = { styles.textInput }
-                  onChangeText = {(text) => this.setState({ postal: text })}
-                />
-                <TextInput
-                  underlineColorAndroid = "transparent"
-                  placeholder = "Adresse"
-                  style = { styles.textInput }
-                  onChangeText = {(text) => this.setState({ address: text })}
-                />
-                <TextInput
-                  underlineColorAndroid = "transparent"
-                  placeholder = "Numéro"
-                  style = { styles.textInput }
-                  onChangeText = {(text) => this.setState({ num: text })}
-                />
+            <View style={styles.firstContainer}>
+              <Text style={styles.Title}>Mes adresses</Text>
+              <TouchableOpacity
+                activeOpacity = { 0.8 } style = { styles.Btn }
+                onPress={this._toggleModalAd}>
+                  <Text style = { styles.btnText }>Nouvelle adresse</Text>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.sendTouch} onPress={this.addAd}>
-              <Text style={styles.btnModal}> Ajouter </Text>
-            </TouchableOpacity>
+            <View style={styles.flatList}>
+              <FlatList
+                data={this.props.dataAddress}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({item}) => <AddressItem address={item} deleteAddress={this._deleteAddress}/>}
+              />
+            </View>
           </View>
-          <View style={styles.modalContainerLast}>
-            <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalAd}>
-              <Text style={styles.btnModal}> Annuler </Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-
-
-          <View style={styles.firstContainer}>
-            <Text style={styles.Title}>Mes adresses</Text>
-          </View>
-          <View style={styles.flatList}>
-            <Text>Pas d'adresse enregistré</Text>
-          </View>
-          <View style={styles.lastContainer}>
-            <TouchableOpacity
-              activeOpacity = { 0.8 } style = { styles.Btn }
-              onPress={this._toggleModalAd}>
-                <Text style = { styles.btnText }>Nouvelle adresse</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              activeOpacity = { 0.8 } style = { styles.Btn }
-              onPress = {() => this.props.navigation.navigate("Poster")}>
-                <Text style = { styles.btnText }>Retour</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )
+        )
+      }
     } else {
       return (
-        <View style={styles.container}>
-            <Modal onModalHide={() => this.displayAnswerAd("fromMessage")} isVisible={this.state.isModalAdChanged}>
-              <View style={styles.modalContainerFirst}>
-                <View style={styles.modalMainR}>
-                    <Text style={styles.TxtModal}>{this.state.isModalAdContent}</Text>
-                </View>
-              </View>
-              <View style={styles.modalContainerLast}>
-                <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalChanged}>
-                  <Text style={styles.btnModal}> OK </Text>
-                </TouchableOpacity>
-              </View>
-            </Modal>
-
-            <Modal onModalHide={() => this.displayAnswerAd("fromForm")} isVisible={this.state.isModalAdVisible} >
-              <View style={styles.modalContainerFirst}>
-                <View style={styles.modalMain}>
-                    <Text style={styles.modalTxtIntro}>Ajouter une adresse</Text>
-                    <TextInput
-                      underlineColorAndroid = "transparent"
-                      placeholder = "Pays"
-                      style = { styles.textInput }
-                      onChangeText = {(text) => this.setState({ country: text })}
-                    />
-                    <TextInput
-                      underlineColorAndroid = "transparent"
-                      placeholder = "Ville"
-                      style = { styles.textInput }
-                      onChangeText = {(text) => this.setState({ city: text })}
-                    />
-                    <TextInput
-                      underlineColorAndroid = "transparent"
-                      placeholder = "Code Postal"
-                      style = { styles.textInput }
-                      onChangeText = {(text) => this.setState({ postal: text })}
-                    />
-                    <TextInput
-                      underlineColorAndroid = "transparent"
-                      placeholder = "Adresse"
-                      style = { styles.textInput }
-                      onChangeText = {(text) => this.setState({ address: text })}
-                    />
-                    <TextInput
-                      underlineColorAndroid = "transparent"
-                      placeholder = "Numéro"
-                      style = { styles.textInput }
-                      onChangeText = {(text) => this.setState({ num: text })}
-                    />
-                </View>
-                <TouchableOpacity style={styles.sendTouch} onPress={this.addAd}>
-                  <Text style={styles.btnModal}> Ajouter </Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.modalContainerLast}>
-                <TouchableOpacity style={styles.sendTouch} onPress={this._toggleModalAd}>
-                  <Text style={styles.btnModal}> Annuler </Text>
-                </TouchableOpacity>
-              </View>
-            </Modal>
-
-
-          <View style={styles.firstContainer}>
-            <Text style={styles.Title}>Mes adresses</Text>
-          </View>
-          <View style={styles.flatList}>
-            <FlatList
-              data={this.props.dataAddress}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({item}) => <AddressItem address={item} deleteAddress={this._deleteAddress}/>}
-            />
-          </View>
-          <View style={styles.lastContainer}>
-            <TouchableOpacity
-              activeOpacity = { 0.8 } style = { styles.Btn }
-              onPress={this._toggleModalAd}>
-                <Text style = { styles.btnText }>Nouvelle adresse</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              activeOpacity = { 0.8 } style = { styles.Btn }
-              onPress = {() => this.props.navigation.navigate("Poster")}>
-                <Text style = { styles.btnText }>Retour</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+          <View style={styles.containerUnconnected}><Text style={styles.txUnconnected}>Vous devez être connecté pour avoir accès à vos adresses !</Text></View>
       )
     }
   }
@@ -347,23 +347,20 @@ const styles = StyleSheet.create({
       alignSelf: 'stretch',
       padding: 8,
       fontSize: 16,
-      marginHorizontal : 15
+      marginHorizontal : '2%'
   },
   container : {
       flex : 1,
-      marginHorizontal : 15,
+      marginHorizontal : '2%',
   },
   firstContainer : {
     marginTop : 30,
     flex : 1,
   },
   flatList : {
-    flex : 4,
+    flex : 6,
     borderTopColor : 'grey',
     borderTopWidth : 1,
-  },
-  lastContainer : {
-    flex : 2,
   },
   Btn: {
       backgroundColor: 'rgba(0,0,0,0.6)',
@@ -419,6 +416,17 @@ const styles = StyleSheet.create({
     color : 'black',
     fontSize : 15,
     margin : 10,
+  },
+  containerUnconnected : {
+    flex : 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  txUnconnected : {
+    margin : 25,
+    color : 'grey',
+    fontSize : 17,
+    textAlign:'center',
   },
 })
 

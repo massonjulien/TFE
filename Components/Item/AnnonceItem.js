@@ -34,12 +34,12 @@ class AddressItem extends React.Component {
 const styles = StyleSheet.create({
   main_container: {
     height: 130,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    marginHorizontal : '2%',
   },
   image: {
     width: 120,
     height: 120,
-    margin: 5,
     backgroundColor: 'gray'
   },
   imageRate: {

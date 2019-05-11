@@ -13,7 +13,7 @@ class Poster extends React.Component {
   }
 
   _displayDetailAnnonce = (id) => {
-    this.props.navigation.navigate("AnnonceDetail", { id: id })
+    this.props.navigation.navigate("AnnonceDetailNew", { id: id })
   }
 
   navigateToNewPost(){
@@ -33,21 +33,14 @@ class Poster extends React.Component {
             <View style={styles.container}>
               <View style={styles.firstContainer}>
                 <Text style={styles.Title}>Mes annonces</Text>
-              </View>
-              <View style={styles.flatContainer}>
-                <Text>Vous n'avez pas d'annonces</Text>
-              </View>
-              <View style={styles.lastContainer}>
                 <TouchableOpacity
                   activeOpacity = { 0.8 } style = { styles.Btn }
                   onPress = {() => this.navigateToNewPost()}>
                     <Text style = { styles.btnText }>Nouvelle annonce</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  activeOpacity = { 0.8 } style = { styles.Btn }
-                  onPress = {() => this.props.navigation.navigate("Address")}>
-                    <Text style = { styles.btnText }>Mes Adresses</Text>
-                </TouchableOpacity>
+              </View>
+              <View style={styles.flatContainer}>
+                <Text>Vous n'avez pas d'annonces</Text>
               </View>
             </View>
           )
@@ -56,6 +49,11 @@ class Poster extends React.Component {
             <View style={styles.container}>
               <View style={styles.firstContainer}>
                 <Text style={styles.Title}>Mes annonces</Text>
+                <TouchableOpacity
+                  activeOpacity = { 0.8 } style = { styles.Btn }
+                  onPress = {() => this.navigateToNewPost()}>
+                    <Text style = { styles.btnText }>Nouvelle annonce</Text>
+                </TouchableOpacity>
               </View>
               <View style={styles.flatContainer}>
                 <FlatList
@@ -63,18 +61,6 @@ class Poster extends React.Component {
                   keyExtractor={(item) => item.id.toString()}
                   renderItem={({item}) => <AnnonceItem displayDetailAnnonce={this._displayDetailAnnonce} annonce={item}/>}
                 />
-              </View>
-              <View style={styles.lastContainer}>
-                <TouchableOpacity
-                  activeOpacity = { 0.8 } style = { styles.Btn }
-                  onPress = {() => this.navigateToNewPost()}>
-                    <Text style = { styles.btnText }>Nouvelle annonce</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  activeOpacity = { 0.8 } style = { styles.Btn }
-                  onPress = {() => this.props.navigation.navigate("Address")}>
-                    <Text style = { styles.btnText }>Mes Adresses</Text>
-                </TouchableOpacity>
               </View>
             </View>
           )
@@ -92,10 +78,10 @@ class Poster extends React.Component {
 
 const styles = StyleSheet.create({
   Title : {
-      textAlign: 'center',
-      fontSize: 20,
-      color: 'grey',
-      marginBottom: 10
+    textAlign: 'center',
+    fontSize: 20,
+    color: 'grey',
+    marginBottom: 10
   },
   txUnconnected : {
     margin : 25,
@@ -109,30 +95,27 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   container : {
-      flex : 1,
-
-      marginBottom : '5%',
+    flex : 1,
+    marginBottom : '5%',
   },
   firstContainer : {
     marginTop : 30,
     flex : 1,
   },
   flatContainer : {
-    flex : 7,
-  },
-  lastContainer : {
-    flex : 2,
+    flex : 6,
   },
   Btn: {
-      backgroundColor: 'rgba(0,0,0,0.6)',
-      alignSelf: 'stretch',
-      padding: 10,
-      marginTop: 10,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    alignSelf: 'stretch',
+    padding: 10,
+    marginTop: 10,
+    marginHorizontal : '2%',
   },
   btnText: {
-      textAlign: 'center',
-      color: 'white',
-      fontSize: 16
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 16,
   },
 })
 
