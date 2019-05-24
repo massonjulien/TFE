@@ -236,9 +236,6 @@ class Address extends React.Component {
                   <Text style = { styles.btnText }>Nouvelle adresse</Text>
               </TouchableOpacity>
             </View>
-            <View style={styles.flatList}>
-              <Text>Pas d'adresse enregistré</Text>
-            </View>
           </View>
         )
       } else {

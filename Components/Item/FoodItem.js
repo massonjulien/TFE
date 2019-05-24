@@ -1,4 +1,4 @@
-// Components/FilmItem.js
+﻿// Components/FilmItem.js
 
 import React from 'react'
 import { StyleSheet, View, Text, Image, TouchableOpacity, Dimensions } from 'react-native'
@@ -41,27 +41,18 @@ class FoodItem extends React.Component {
         <TouchableOpacity
           style={styles.main_container}
           onPress={() => displayDetailFood(food.id)}>
-          <Image
-            style={styles.image}
-            source={{uri : food.advertpicture}}
-          />
-          <View style={styles.content_container}>
-            <View style={styles.header_container}>
-              <View style={styles.header_container_one}>
-                  <Text style={styles.title_text}>{food.name}</Text>
-              </View>
-              <View style={styles.header_container_two}>
-                {rate}
-              </View>
-            </View>
-            <View style={styles.bodyContainer}>
-              <Text style={styles.auteur}>{food.firstname} {food.lastname }</Text>
-              <Text style={styles.nbPart}>{food.qtavaible} part(s) disponible à {food.price}€/part</Text>
-              {/* La propriété numberOfLines permet de couper un texte si celui-ci est trop long, il suffit de définir un nombre maximum de ligne */}
-            </View>
-            <View style={styles.horaireContainer}>
-              <Text style={styles.nbPart}>Take away de {food.beginhour} à {food.endhour}</Text>
-            </View>
+          <View   style={styles.advertPicture_container}>
+            <Image
+              style={styles.image}
+              resizeMode = {'contain'}
+              source={{uri : food.advertpicture}}
+            />
+          </View>
+            {rate}
+            <Text style={styles.title_text}>{food.name}</Text>
+            <Text style={styles.nbPart}>{food.qtavaible} part(s) au prix de {food.price}€</Text>
+            <Text style={styles.nbPart}>{food.beginhour} - {food.endhour}</Text>
+          <View>
           </View>
         </TouchableOpacity>
       )
@@ -76,65 +67,36 @@ class FoodItem extends React.Component {
 
 
 const styles = StyleSheet.create({
-  main_container: {
-    height: 130,
-    flexDirection: 'row'
+  main_container : {
+    height : 230,
+    marginTop : 10,
+    marginBottom : 10,
+    marginRight : 20,
+    marginLeft : 20,
+    borderColor : 'black',
+    borderWidth : 1,
+    borderRadius : 10,
   },
-  horaireContainer : {
-    flex : 3,
+  image : {
+    height : 130,
   },
-  image: {
-    width: 120,
-    height: 120,
-    margin: 5,
-    backgroundColor: 'gray'
+  advertPicture_container : {
+    height : 130,
+    borderTopLeftRadius : 10,
+    borderTopRightRadius : 10,
+    backgroundColor : 'grey',
   },
-  imageRate: {
-    width: 100,
-    height: 20,
-    margin: 5,
-    backgroundColor: 'gray'
-  },
-  content_container: {
-    flex: 1,
-    margin: 5
-  },
-  header_container: {
-    flex: 3,
-  },
-  header_container_one : {
-    flex : 2,
-  },
-  header_container_two : {
-    flex : 1,
-  },
-  title_text: {
+  title_text : {
     fontWeight: 'bold',
-    fontSize: RF(2),
-    flex: 4,
-    flexWrap: 'wrap',
-    paddingRight: 5
+    color : 'black',
+    marginLeft : 15,
   },
-  nbPart: {
-    fontWeight: 'bold',
-    fontSize: RF(1.5),
-    color: '#666666'
-  },
-  bodyContainer: {
-    flex: 3,
-  },
-  auteur: {
-    fontStyle: 'italic',
-    color: '#666666',
-    flex: 3
-  },
-  rate: {
-    flex: 2,
-    fontSize : RF(1.5),
-  },
-  imageRate: {
-
+  nbPart : {
+    fontStyle : 'italic',
+    color : 'black',
+    marginLeft : 20,
   }
+
 })
 
 export default FoodItem

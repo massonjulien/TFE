@@ -39,9 +39,6 @@ class Poster extends React.Component {
                     <Text style = { styles.btnText }>Nouvelle annonce</Text>
                 </TouchableOpacity>
               </View>
-              <View style={styles.flatContainer}>
-                <Text>Vous n'avez pas d'annonces</Text>
-              </View>
             </View>
           )
         } else {
